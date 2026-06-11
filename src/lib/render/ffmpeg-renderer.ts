@@ -3,7 +3,6 @@ import { mkdir, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
-import { mediaAssets, subtitleSegments, videoProjects, videoScenes } from "@/lib/mock-data";
 import { checkFfmpeg, getFfmpegPath } from "@/lib/render/ffmpeg-check";
 import { saveRenderArtifact } from "@/lib/media/render-artifacts";
 import { validateMp4Artifact } from "@/lib/media/ffmpeg";
@@ -25,12 +24,12 @@ export async function renderVideoWithFfmpeg(input: { videoProjectId: string; qua
   }
 
   const bundle = await getVideoProjectBundle(input.videoProjectId);
-  const project = bundle?.project ?? videoProjects.find((item) => item.id === input.videoProjectId);
-  if (!project) return failed("video_project_id nao encontrado.", logs, startedAt);
+  if (!bundle) return failed("video_project_id nao encontrado no Supabase real.", logs, startedAt);
+  const project = bundle.project;
 
-  const scenes = (bundle?.scenes ?? videoScenes.filter((scene) => scene.videoProjectId === project.id)).sort((a, b) => a.orderIndex - b.orderIndex);
+  const scenes = bundle.scenes.sort((a, b) => a.orderIndex - b.orderIndex);
   if (!scenes.length) return failed("Nenhuma cena encontrada para renderizar.", logs, startedAt);
-  const sceneAssets = new Map((bundle?.mediaAssets ?? mediaAssets).map((asset) => [asset.id, asset]));
+  const sceneAssets = new Map(bundle.mediaAssets.map((asset) => [asset.id, asset]));
 
   const size = sizeFor(project.aspectRatio, input.quality);
   const tmpDir = path.join(process.cwd(), ".render-tmp", `${project.id}-${Date.now()}`);
@@ -60,7 +59,7 @@ export async function renderVideoWithFfmpeg(input: { videoProjectId: string; qua
     await ffmpegExec(["-y", "-f", "concat", "-safe", "0", "-i", concatList, "-c", "copy", joinedPath], logs);
 
     let currentPath = joinedPath;
-    const subtitles = bundle?.subtitles ?? subtitleSegments.filter((item) => item.videoProjectId === project.id);
+    const subtitles = bundle.subtitles;
     if (project.subtitleEnabled && subtitles.length) {
       logs.push("Renderizando legendas");
       const srtPath = path.join(tmpDir, "subtitles.srt");

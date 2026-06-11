@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
   if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
   const platform = (body.target_platform ?? "youtube_shorts") as ExportPlatform;
   const ids = body.video_project_ids as string[] | undefined;
+  const videoProjectId = String(body.video_project_id ?? "");
+  if (!ids?.length && !videoProjectId) return NextResponse.json({ status: "failed", error: "video_project_id obrigatorio." }, { status: 400 });
   const requiredCredits = ids?.length ? ids.length : 1;
   const { user } = await requireAuth();
   await requirePermission(workspaceId, "export_video");
@@ -23,7 +25,7 @@ export async function POST(request: NextRequest) {
     userId: user.id,
     type: "export_package",
     priority: ids?.length ? 8 : 6,
-    payload: { ...body, target_platform: platform, video_project_ids: ids, required_credits: requiredCredits }
+    payload: { ...body, video_project_id: videoProjectId || undefined, target_platform: platform, video_project_ids: ids, required_credits: requiredCredits }
   });
 
   await registerAuditLog({

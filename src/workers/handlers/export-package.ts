@@ -11,7 +11,7 @@ export const exportPackageHandler: JobHandler = async (job, context) => {
   await context.update(45, "Gerando metadados");
   const result = ids?.length
     ? await createBulkExportPackage(ids, platform)
-    : await createRealExportPackage(String(job.payload.video_project_id ?? "video_1"), platform);
+    : await createRealExportPackage(String(job.payload.video_project_id ?? ""), platform);
   await context.log("Export package executado", { status: result.status });
   if (result.status === "failed") throw new Error(result.error);
   await logMediaUsage({ workspaceId: job.workspaceId, userId: job.userId, provider: "internal_zip", actionType: "export_package", units: 1, cost: Number(job.payload.required_credits ?? 0), referenceId: job.id });

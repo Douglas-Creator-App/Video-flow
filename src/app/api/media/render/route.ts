@@ -7,7 +7,8 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const workspaceId = String(body.workspace_id ?? "");
   if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
-  const videoProjectId = body.video_project_id ?? "video_1";
+  const videoProjectId = String(body.video_project_id ?? "");
+  if (!videoProjectId) return NextResponse.json({ status: "failed", error: "video_project_id obrigatorio." }, { status: 400 });
   const preview = body.preview === true;
   const requiredCredits = preview ? 1 : Number(body.duration_seconds ?? 60) > 90 ? 10 : 3;
   const { user } = await requireAuth();

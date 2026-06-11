@@ -23,7 +23,7 @@ import {
   videoScenes as initialScenes,
   visualStylePresets
 } from "@/lib/mock-data";
-import type { MotionType, TransitionType, VideoScene } from "@/lib/types";
+import type { MediaAsset, MotionType, TransitionType, VideoProject, VideoScene } from "@/lib/types";
 import { TooltipHint } from "@/components/onboarding/onboarding-wizard";
 import { QualityPanel } from "@/components/quality/video-quality-panels";
 import { JobProgressPanel } from "@/components/jobs/job-progress-panel";
@@ -33,10 +33,13 @@ import { useVideoRenders } from "@/lib/workspace/hooks";
 export function VideoEditor({ videoId }: { videoId: string }) {
   const { currentWorkspace } = useWorkspaceProvider();
   const workspaceId = currentWorkspace?.id ?? "";
-  const video = videoProjects.find((item) => item.id === videoId) ?? videoProjects[0];
+  const fallbackVideo = videoProjects.find((item) => item.id === videoId) ?? videoProjects[0];
+  const [video, setVideo] = useState<VideoProject>(fallbackVideo);
   const rendersQuery = useVideoRenders(workspaceId);
   const latestRealRender = ((rendersQuery.data?.renders ?? []) as Array<Record<string, unknown>>).find((render) => String(render.video_project_id) === video.id);
-  const [scenes, setScenes] = useState<VideoScene[]>(initialScenes.filter((scene) => scene.videoProjectId === video.id));
+  const [scenes, setScenes] = useState<VideoScene[]>(initialScenes.filter((scene) => scene.videoProjectId === fallbackVideo.id));
+  const [realAssets, setRealAssets] = useState<MediaAsset[]>([]);
+  const [projectSource, setProjectSource] = useState<"loading" | "real" | "demo" | "error">("loading");
   const [selectedSceneId, setSelectedSceneId] = useState(scenes[0]?.id ?? "");
   const [renderUrl, setRenderUrl] = useState(video.renderUrl ?? "");
   const [renderStatus, setRenderStatus] = useState<string>(video.status);
@@ -49,6 +52,37 @@ export function VideoEditor({ videoId }: { videoId: string }) {
   const [assetPickerOpen, setAssetPickerOpen] = useState(false);
   const selectedScene = scenes.find((scene) => scene.id === selectedSceneId) ?? scenes[0];
   const currentAudio = audioSettings.find((item) => item.videoProjectId === video.id);
+  const displayRenderUrl = projectSource === "real" ? renderUrl : "";
+
+  useEffect(() => {
+    if (!workspaceId) {
+      setProjectSource("demo");
+      return;
+    }
+    let cancelled = false;
+    async function loadRealProject() {
+      setProjectSource("loading");
+      try {
+        const response = await fetch(`/api/video-projects/${videoId}?workspace_id=${encodeURIComponent(workspaceId)}`, { cache: "no-store" });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error ?? "Video project real nao encontrado.");
+        if (cancelled) return;
+        setVideo(payload.bundle.project);
+        setScenes(payload.bundle.scenes ?? []);
+        setRealAssets(payload.bundle.mediaAssets ?? []);
+        setSelectedSceneId(payload.bundle.scenes?.[0]?.id ?? "");
+        setRenderUrl(payload.bundle.project.renderUrl ?? "");
+        setRenderStatus(payload.bundle.project.status ?? "ready_to_render");
+        setProjectSource("real");
+      } catch {
+        if (!cancelled) setProjectSource("demo");
+      }
+    }
+    void loadRealProject();
+    return () => {
+      cancelled = true;
+    };
+  }, [videoId, workspaceId]);
 
   useEffect(() => {
     const realRenderUrl = latestRealRender?.render_url ? String(latestRealRender.render_url) : "";
@@ -195,9 +229,9 @@ export function VideoEditor({ videoId }: { videoId: string }) {
   return (
     <div className="space-y-6">
       <TooltipHint title="Voce pode trocar imagens e cenas" description="Use a Biblioteca para inserir assets, ajuste prompts, mova cenas na timeline e renderize quando o preview estiver pronto." />
-      <div className="rounded-md border border-amber-400/20 bg-amber-400/10 p-3 text-sm text-amber-200">
-        <p className="font-semibold text-foreground">Modo demonstracao ativo</p>
-        <p className="mt-1">Preview pode usar assets mockados. Render final e download so sao liberados quando houver MP4 real verificado no storage.</p>
+      <div className={`rounded-md border p-3 text-sm ${projectSource === "real" ? "border-primary/20 bg-primary/5 text-muted-foreground" : "border-amber-400/20 bg-amber-400/10 text-amber-200"}`}>
+        <p className="font-semibold text-foreground">{projectSource === "real" ? "Projeto real carregado" : "Projeto demonstrativo"}</p>
+        <p className="mt-1">{projectSource === "real" ? "Cenas, assets e render usam Supabase como fonte. Render final exige FFmpeg e storage real." : "Este ID ainda nao existe no Supabase real. Render/download final ficam bloqueados para dados demonstrativos."}</p>
       </div>
       <section className="grid gap-4 xl:grid-cols-[1fr_380px]">
         <Card className="border-primary/20 bg-gradient-to-br from-card to-secondary">
@@ -211,7 +245,7 @@ export function VideoEditor({ videoId }: { videoId: string }) {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {renderUrl ? <video src={renderUrl} controls className="max-h-[520px] w-full rounded-lg border border-primary/20 bg-black object-contain" /> : null}
+            {displayRenderUrl ? <video src={displayRenderUrl} controls className="max-h-[520px] w-full rounded-lg border border-primary/20 bg-black object-contain" /> : null}
             <div className="grid min-h-[360px] place-items-center rounded-lg border border-primary/20 bg-black/60">
               <div className="text-center">
                 <Play className="mx-auto mb-4 h-12 w-12 text-primary" />
@@ -224,11 +258,11 @@ export function VideoEditor({ videoId }: { videoId: string }) {
               <Button variant="outline" className="gap-2" onClick={applyOrganicMotion}><Sparkles className="h-4 w-4" />Aplicar movimento em todas</Button>
               <Button variant="outline" onClick={() => generateSceneVideo("intro")}>Gerar abertura</Button>
               <Button variant="outline" onClick={() => generateSceneVideo("outro")}>Gerar encerramento</Button>
-              <Button variant="outline" onClick={() => renderVideo(true)}>Gerar preview rápido ({previewStatus})</Button>
+              <Button variant="outline" onClick={() => renderVideo(true)} disabled={projectSource !== "real"}>Gerar preview rápido ({previewStatus})</Button>
               <Button variant="outline" asChild><Link href={`/app/videos/${video.id}/thumbnails`}>Gerar thumbnail</Link></Button>
               <Button variant="outline" className="gap-2" onClick={() => setAssetPickerOpen(true)}><Library className="h-4 w-4" />Biblioteca</Button>
-              <Button className="gap-2" onClick={() => renderVideo(false)}><Video className="h-4 w-4" />Renderizar</Button>
-              {renderUrl ? <Button variant="outline" asChild><a href={renderUrl} download>Download final</a></Button> : <Button variant="outline" disabled>Download final bloqueado</Button>}
+              <Button className="gap-2" onClick={() => renderVideo(false)} disabled={projectSource !== "real"}><Video className="h-4 w-4" />Renderizar</Button>
+              {displayRenderUrl ? <Button variant="outline" asChild><a href={displayRenderUrl} download>Download final</a></Button> : <Button variant="outline" disabled>Download final bloqueado</Button>}
             </div>
             {statusMessage ? (
               <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
@@ -271,7 +305,7 @@ export function VideoEditor({ videoId }: { videoId: string }) {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-4">
-        <MediaPanel />
+        <MediaPanel assets={realAssets} />
         <SubtitlePanel />
         <AudioPanel currentAudio={currentAudio} />
         <EffectsPanel renderRows={((rendersQuery.data?.renders ?? []) as Array<Record<string, unknown>>).filter((render) => String(render.video_project_id) === video.id)} />
@@ -306,8 +340,9 @@ function PropertiesPanel({ scene, updateScene, generateSceneImage, generateScene
   );
 }
 
-function MediaPanel() {
-  return <Panel title="Mídia" description="Troca de imagens e variações">{mediaAssets.map((asset) => <Badge key={asset.id}>{asset.title}</Badge>)}</Panel>;
+function MediaPanel({ assets }: { assets: MediaAsset[] }) {
+  const rows = assets.length ? assets : mediaAssets;
+  return <Panel title="Midia" description={assets.length ? "Assets reais do projeto" : "Assets demonstrativos"}>{rows.map((asset) => <Badge key={asset.id}>{asset.title}</Badge>)}</Panel>;
 }
 
 function AssetPicker({ onClose, onInsert }: { onClose: () => void; onInsert: (assetId: string) => void }) {

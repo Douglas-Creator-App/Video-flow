@@ -3,9 +3,8 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { isVerifiedArtifactUrl } from "@/lib/artifact-verification";
-import { channels, exportPackages, thumbnailGenerations, videoMetadataItems, videoProjects } from "@/lib/mock-data";
 import { generateText } from "@/lib/providers/openai-text";
-import { generateVideoMetadata, platformLabel, platformPresets } from "@/lib/export-center";
+import { platformLabel, platformPresets } from "@/lib/export-center";
 import { writeZipFile } from "@/lib/export/zip-writer";
 import { extractFrameThumbnail } from "@/lib/media/ffmpeg";
 import { getLatestRenderArtifact } from "@/lib/media/render-artifacts";
@@ -15,6 +14,7 @@ import type { ExportPackage, ExportPlatform, VideoMetadata } from "@/lib/types";
 
 export async function createRealExportPackage(videoProjectId: string, targetPlatform: ExportPlatform) {
   const logs = ["Export solicitado", `Plataforma: ${targetPlatform}`];
+  if (!videoProjectId) return failed("video_project_id obrigatorio para export real.", logs);
   const payload = await buildPackagePayload(videoProjectId, targetPlatform, logs);
   if (payload.status === "failed") return payload;
 
@@ -37,7 +37,7 @@ export async function createRealExportPackage(videoProjectId: string, targetPlat
   const pkg: ExportPackage = {
     id: randomUUID(),
     workspaceId: payload.video.workspaceId,
-    channelId: channels[0]?.id ?? "channel_1",
+    channelId: "",
     videoProjectId: payload.video.id,
     title: payload.metadata.title,
     targetPlatform,
@@ -73,7 +73,7 @@ export async function createBulkExportPackage(videoProjectIds: string[], targetP
   let packageUrl = `/exports/${packageName}`;
   if (isSupabaseStorageConfigured()) {
     const firstBundle = videoProjectIds[0] ? await getVideoProjectBundle(videoProjectIds[0]) : null;
-    const workspaceId = firstBundle?.project.workspaceId ?? (videoProjectIds[0] ? videoProjects.find((item) => item.id === videoProjectIds[0])?.workspaceId : undefined);
+    const workspaceId = firstBundle?.project.workspaceId;
     if (!workspaceId) return { status: "failed" as const, error: "Workspace do lote nao encontrado.", logs };
     const object = await uploadMediaFile({ bucket: "exports", objectPath: buildWorkspaceStoragePath({ workspaceId, resourceType: "bulk", fileId: `${targetPlatform}-${Date.now()}`, extension: "zip" }), filePath: outputPath, contentType: "application/zip" });
     packageUrl = object.url;
@@ -83,8 +83,8 @@ export async function createBulkExportPackage(videoProjectIds: string[], targetP
 
 async function buildPackagePayload(videoProjectId: string, targetPlatform: ExportPlatform, logs: string[]) {
   const bundle = await getVideoProjectBundle(videoProjectId);
-  const video = bundle?.project ?? videoProjects.find((item) => item.id === videoProjectId);
-  if (!video) return failed("Video nao encontrado.", logs);
+  if (!bundle) return failed("Video nao encontrado no Supabase real.", logs);
+  const video = bundle.project;
   const renderArtifact = await getLatestRenderArtifact(videoProjectId);
   const renderUrl = video.renderUrl && isVerifiedArtifactUrl(video.renderUrl) ? video.renderUrl : renderArtifact?.renderUrl;
   if (!renderUrl || !isVerifiedArtifactUrl(renderUrl)) return failed("Video ainda nao renderizado ou render_url ausente.", logs);
@@ -93,7 +93,7 @@ async function buildPackagePayload(videoProjectId: string, targetPlatform: Expor
   const videoPath = storageRender ? null : publicPathFromUrl(renderUrl);
   if (!storageRender && (!videoPath || !existsSync(videoPath))) return failed("Arquivo MP4 nao encontrado no storage/local public.", logs);
 
-  const thumbnailUrl = video.thumbnailUrl ?? thumbnailGenerations.find((item) => item.videoProjectId === video.id)?.selectedImageUrl ?? renderArtifact?.thumbnailUrl;
+  const thumbnailUrl = video.thumbnailUrl ?? renderArtifact?.thumbnailUrl;
   const storageThumbnail = thumbnailUrl ? parseStorageUrl(thumbnailUrl) : null;
   const thumbnailPath = await resolveThumbnailPath(thumbnailUrl, videoPath, video.id, logs);
   if (!storageThumbnail && (!thumbnailPath || !existsSync(thumbnailPath))) return failed("Thumbnail ausente no storage/local public.", logs);
@@ -123,16 +123,18 @@ async function getOrGenerateMetadata(videoProjectId: string, platform: ExportPla
 }
 
 async function createGeneratedMetadata(videoProjectId: string, platform: ExportPlatform): Promise<VideoMetadata> {
-  const existing = videoMetadataItems.find((item) => item.videoProjectId === videoProjectId && item.platform === platform);
-  if (existing) return existing;
   const bundle = await getVideoProjectBundle(videoProjectId);
-  const base = bundle?.project ? buildBaseMetadata(bundle.project, platform) : generateVideoMetadata(videoProjectId, platform);
+  if (!bundle) throw new Error("Video real obrigatorio para gerar metadados de export.");
+  const base = buildBaseMetadata(bundle.project, platform);
   const ai = await generateText({
     systemPrompt: "Voce gera metadados para publicacao manual de videos. Responda em JSON valido.",
     userPrompt: `Crie titulo, 5 titulos alternativos, descricao, hashtags, tags, comentario fixado e CTA para plataforma ${platform}. Tema: ${base.title}`,
     maxTokens: 700,
     temperature: 0.6
   });
+  if (ai.providerMode !== "real") {
+    throw new Error(ai.warning ?? "OpenAI Text real indisponivel para gerar metadados de export.");
+  }
   try {
     const parsed = JSON.parse(ai.text);
     return { ...base, title: parsed.title ?? base.title, titleVariations: parsed.titleVariations ?? base.titleVariations, description: parsed.description ?? base.description, hashtags: parsed.hashtags ?? base.hashtags, tags: parsed.tags ?? base.tags, pinnedComment: parsed.pinnedComment ?? base.pinnedComment, cta: parsed.cta ?? base.cta };

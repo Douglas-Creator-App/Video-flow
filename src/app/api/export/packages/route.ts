@@ -1,7 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { bulkExportJobs, exportPackages, manualPublications, videoMetadataItems } from "@/lib/mock-data";
 import { requireAuth, requirePermission, requireRateLimit } from "@/lib/auth";
-import { createExportPackage } from "@/lib/export-center";
 import { createBulkExportPackage, createRealExportPackage } from "@/lib/export/export-package";
 import { createAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
 import type { ExportPlatform } from "@/lib/types";
@@ -81,6 +79,9 @@ export async function POST(request: NextRequest) {
   }
 
   if (action === "mark_published") {
+    const videoProjectId = String(body.video_project_id ?? "");
+    if (!videoProjectId) return NextResponse.json({ status: "failed", error: "video_project_id obrigatorio." }, { status: 400 });
+    if (!body.export_package_id) return NextResponse.json({ status: "failed", error: "export_package_id obrigatorio." }, { status: 400 });
     if (body.artifact_verified !== true) {
       return NextResponse.json({
         status: "blocked",
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
       publication: {
         id: `manual_publication_${Date.now()}`,
         workspaceId,
-        videoProjectId: body.video_project_id ?? "video_1",
+        videoProjectId,
         exportPackageId: body.export_package_id,
         platform: body.platform ?? "youtube_shorts",
         publishedUrl: body.published_url ?? "",
@@ -104,24 +105,17 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const realResult = await createRealExportPackage(body.video_project_id ?? "video_1", (body.target_platform ?? "youtube_shorts") as ExportPlatform);
+  const videoProjectId = String(body.video_project_id ?? "");
+  if (!videoProjectId) return NextResponse.json({ status: "failed", error: "video_project_id obrigatorio." }, { status: 400 });
+  const realResult = await createRealExportPackage(videoProjectId, (body.target_platform ?? "youtube_shorts") as ExportPlatform);
   if (realResult.status === "ready") {
     return NextResponse.json({ ...realResult, status: "ready", artifact_verified: true, warning: realResult.warning });
   }
 
-  const result = createExportPackage({
-    workspaceId,
-    channelId: body.channel_id ?? "channel_1",
-    videoProjectId: body.video_project_id ?? "video_1",
-    targetPlatform: (body.target_platform ?? "youtube_shorts") as ExportPlatform,
-    title: body.title
-  });
-
   return NextResponse.json({
-    ...result,
-    status: "preparing",
+    status: "failed",
     artifact_verified: false,
     error: realResult.error,
-    warning: realResult.error ?? "Manifest do pacote pronto. Download e publicacao manual ficam bloqueados ate ZIP/MP4 reais serem verificados."
-  });
+    warning: realResult.error ?? "Export real falhou. Nenhum pacote demonstrativo foi criado."
+  }, { status: 409 });
 }

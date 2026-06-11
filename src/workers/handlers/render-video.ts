@@ -4,7 +4,8 @@ import { logMediaUsage } from "@/lib/billing/credit-ledger";
 import type { JobHandler } from "@/workers/handlers/types";
 
 export const renderVideoHandler: JobHandler = async (job, context) => {
-  const videoProjectId = String(job.payload.video_project_id ?? job.payload.videoProjectId ?? "video_1");
+  const videoProjectId = String(job.payload.video_project_id ?? job.payload.videoProjectId ?? "");
+  if (!videoProjectId) throw new Error("video_project_id obrigatorio para render_video.");
   const quality = (job.payload.quality ?? "final") as RenderQuality;
   await context.update(12, "Validando projeto e FFmpeg");
   const ffmpeg = assertFfmpegAvailable();
