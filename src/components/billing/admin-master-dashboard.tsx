@@ -16,15 +16,14 @@ import {
   platformAdmins,
   providerCostSummaries
 } from "@/lib/mock-data";
-import { createMockBillingEvent } from "@/lib/billing";
-import type { AdminWorkspaceSummary, BillingEvent } from "@/lib/types";
+import type { AdminWorkspaceSummary } from "@/lib/types";
 import { AdminTemplatePanel } from "@/components/templates/premium-template-store";
 import { AdminStudioInsightsPanel } from "@/components/studio/youtube-studio-ai-panels";
 import { AdminFactoryPanel } from "@/components/factories/content-factory-panels";
 
 export function AdminMasterDashboard() {
   const [workspaces, setWorkspaces] = useState(adminWorkspaceSummaries);
-  const [events, setEvents] = useState<BillingEvent[]>([]);
+  const [events, setEvents] = useState<Array<{ id: string; eventType: string; createdAt: string }>>([]);
 
   const totals = useMemo(() => ({
     workspaces: workspaces.length,
@@ -39,7 +38,12 @@ export function AdminMasterDashboard() {
   }), [workspaces]);
 
   function addEvent(workspace: AdminWorkspaceSummary, eventType: string, payload: Record<string, unknown>) {
-    setEvents((items) => [createMockBillingEvent({ workspaceId: workspace.workspaceId, eventType, payload }), ...items]);
+    setEvents((items) => [{
+      id: `demo_billing_event_${Date.now()}`,
+      eventType: `${eventType} (${workspace.name})`,
+      createdAt: new Date().toISOString()
+    }, ...items]);
+    void payload;
   }
 
   function updateWorkspace(workspaceId: string, patch: Partial<AdminWorkspaceSummary>, eventType: string) {

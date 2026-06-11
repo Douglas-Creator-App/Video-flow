@@ -1,6 +1,5 @@
-import { billingEvents } from "@/lib/mock-data";
 import { createAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin";
-import type { BillingEvent, BillingFeature, BillingProvider, CreditPackage, FeatureUsageDecision, Plan, Subscription, UsageSnapshot } from "@/lib/types";
+import type { BillingFeature, FeatureUsageDecision, Plan, Subscription, UsageSnapshot } from "@/lib/types";
 
 export const featureCosts: Record<BillingFeature, number> = {
   generate_script: 1.2,
@@ -174,31 +173,6 @@ export async function ensureCreditWallet(workspaceId: string, plan?: Plan) {
   return wallet as DbWallet;
 }
 
-export function createMockBillingEvent(input: {
-  workspaceId: string;
-  eventType: string;
-  provider?: BillingProvider;
-  payload: Record<string, unknown>;
-}): BillingEvent {
-  return {
-    id: `billing_event_${Date.now()}`,
-    workspaceId: input.workspaceId,
-    provider: input.provider ?? "placeholder",
-    eventType: input.eventType,
-    payload: input.payload,
-    status: "mocked",
-    createdAt: new Date().toISOString()
-  };
-}
-
-export function previewCheckoutEvent(workspaceId: string, target: Plan | CreditPackage, eventType: "plan_checkout_created" | "credit_package_checkout_created") {
-  const payload = "slug" in target
-    ? { plan: target.name, slug: target.slug, monthlyPrice: target.monthlyPrice, provider: "placeholder" }
-    : { package: target.name, credits: target.credits + target.bonusCredits, price: target.price, provider: "placeholder" };
-
-  return createMockBillingEvent({ workspaceId, eventType, payload });
-}
-
 export async function getWorkspaceSubscription(workspaceId: string): Promise<Subscription | undefined> {
   if (!isSupabaseAdminConfigured()) return undefined;
   const { data, error } = await createAdminClient()
@@ -217,10 +191,6 @@ export async function getSubscriptionPlan(subscription?: Subscription): Promise<
   const { data, error } = await createAdminClient().from("plans").select("*").eq("id", subscription.planId).maybeSingle();
   if (error) throw new Error(`Falha ao consultar plano: ${error.message}`);
   return data ? mapPlan(data as DbPlan) : undefined;
-}
-
-export function currentBillingEvents(workspaceId: string, extraEvents: BillingEvent[] = []) {
-  return [...extraEvents, ...billingEvents].filter((item) => item.workspaceId === workspaceId);
 }
 
 async function getUsageSnapshot(workspaceId: string): Promise<UsageSnapshot> {
