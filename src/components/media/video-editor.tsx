@@ -153,7 +153,7 @@ export function VideoEditor({ videoId }: { videoId: string }) {
 
   async function generateSceneVideo(type: "image_to_video" | "text_to_video" | "intro" | "outro" = "image_to_video") {
     if (!selectedScene) return;
-    setStatusMessage("Gerando asset de video IA em modo demonstracao...");
+    setStatusMessage("Enfileirando asset de video IA real...");
     try {
       const result = await fetch("/api/ai-video/jobs", {
         method: "POST",
@@ -164,8 +164,8 @@ export function VideoEditor({ videoId }: { videoId: string }) {
           video_project_id: video.id,
           scene_id: selectedScene.id,
           project_id: video.projectId,
-          provider: "mock",
-          input_image_url: "/media/mock-scene-1.jpg",
+          provider: "runway",
+          input_image_url: selectedScene.mediaAssetId ? undefined : "",
           motion_prompt: "Movimento cinematografico suave",
           prompt: selectedScene.imagePrompt,
           duration_seconds: Math.min(10, selectedScene.durationSeconds),
@@ -175,8 +175,7 @@ export function VideoEditor({ videoId }: { videoId: string }) {
       });
       const data = await result.json();
       if (!result.ok) throw new Error(data.error ?? "Falha ao gerar video IA.");
-      if (data.asset?.videoUrl) updateScene(selectedScene.id, { videoPrompt: data.asset.videoUrl, status: "completed" });
-      setStatusMessage(data.logs?.join(" | ") ?? "Asset de video IA criado.");
+      setStatusMessage(data.job_id ? `${data.warning ?? "AI Video enfileirado."} Job: ${data.job_id}` : data.error ?? "AI Video solicitado.");
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : "Falha ao gerar video IA.");
     }
