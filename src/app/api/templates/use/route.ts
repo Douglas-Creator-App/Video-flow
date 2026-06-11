@@ -1,0 +1,51 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { registerAuditLog } from "@/lib/audit";
+import { requireAuth, requirePermission } from "@/lib/auth";
+import { getPremiumTemplate, templateToMagicSettings } from "@/lib/premium-templates";
+
+const allowedActions = ["create_channel", "magic_mode", "save_personal", "duplicate", "edit_settings"] as const;
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  await requireAuth();
+  await requirePermission(String(body.workspace_id ?? "ws_1"), "workspace.manage");
+  const action = allowedActions.includes(body.action) ? body.action : "magic_mode";
+  const template = getPremiumTemplate(body.template_id ?? "");
+
+  await registerAuditLog({
+    action: action === "edit_settings" ? "update" : "create",
+    entityType: "premium_template",
+    entityId: template.id,
+    metadata: { event: "template_action", action, template: template.name }
+  });
+
+  return NextResponse.json({
+    status: "completed",
+    action,
+    template_id: template.id,
+    message: messageFor(action, template.name),
+    magic_settings: templateToMagicSettings(template),
+    inherited: {
+      niche: template.niche,
+      format: template.defaultFormat,
+      duration: template.defaultDuration,
+      narrative_type: template.narrativeType,
+      voice_id: template.defaultVoiceId,
+      visual_style: template.visualStyle,
+      subtitle_style: template.subtitleStyle,
+      music_mood: template.musicMood,
+      thumbnail_prompt: template.thumbnailPrompt
+    }
+  });
+}
+
+function messageFor(action: string, templateName: string) {
+  const messages: Record<string, string> = {
+    create_channel: `Canal mockado preparado com o template ${templateName}.`,
+    magic_mode: `Magic Mode preparado com o template ${templateName}.`,
+    save_personal: `Template ${templateName} salvo como personalizado em modo demo.`,
+    duplicate: `Template ${templateName} duplicado em modo demo.`,
+    edit_settings: `Configuracoes do template ${templateName} abertas em modo demo.`
+  };
+  return messages[action] ?? messages.magic_mode;
+}

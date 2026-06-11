@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 35 43% 94%;
+    --card: 0 0% 10%;
+    --card-foreground: 35 43% 94%;
+    --primary: 45 53% 54%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 35 43% 94%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 35 43% 94% / 0.62;
+    --accent: 45 80% 70%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 35 43% 94%;
+    --border: 0 0% 100% / 0.08;
+    --input: 0 0% 100% / 0.1;
+    --ring: 45 53% 54%;
+    --gold-light: 45 76% 70%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 35 43% 94%;
+    --card: 0 0% 10%;
+    --card-foreground: 35 43% 94%;
+    --primary: 45 53% 54%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 35 43% 94%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 35 43% 94% / 0.62;
+    --accent: 45 80% 70%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 35 43% 94%;
+    --border: 0 0% 100% / 0.08;
+    --input: 0 0% 100% / 0.1;
+    --ring: 45 53% 54%;
+    --gold-light: 45 76% 70%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background:
+      radial-gradient(ellipse at top, rgb(201 168 76 / 0.1) 0%, transparent 36%),
+      linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  ::selection {
+    background: rgb(201 168 76 / 0.32);
+    color: #f5f0e8;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(201 168 76 / 0.24);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(201 168 76 / 0.42);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
