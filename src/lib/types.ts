@@ -2,6 +2,7 @@ export type RoleName = "Owner" | "Admin" | "Manager" | "Editor" | "Viewer";
 
 export type PermissionAction =
   | "workspace.manage"
+  | "admin.manage"
   | "users.invite"
   | "users.remove"
   | "roles.manage"
@@ -18,6 +19,22 @@ export type PermissionAction =
   | "media.generate"
   | "media.manage"
   | "billing.manage"
+  | "export_video"
+  | "download_package"
+  | "mark_as_published"
+  | "edit_metadata"
+  | "upload_asset"
+  | "delete_asset"
+  | "edit_asset"
+  | "favorite_asset"
+  | "create_collection"
+  | "import_external_asset"
+  | "view_templates"
+  | "create_template"
+  | "edit_template"
+  | "delete_template"
+  | "use_template"
+  | "manage_template_packs"
   | "audit.read";
 
 export type AuditAction = "login" | "logout" | "create" | "delete" | "update";

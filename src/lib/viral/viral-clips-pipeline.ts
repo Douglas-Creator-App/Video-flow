@@ -83,7 +83,9 @@ export async function runViralClipsPipeline(input: {
   if (!input.rightsConfirmed) throw new Error("Confirme que voce possui direito de uso deste conteudo.");
   if (!validation.valid) throw new Error(validation.reason ?? "Fonte invalida.");
 
-  const workspaceId = input.workspaceId ?? "ws_1";
+  if (!input.workspaceId) throw new Error("workspaceId obrigatorio para Viral Clips.");
+  const workspaceId = input.workspaceId;
+  const userId = input.userId ?? "system";
   const jobId = `viral_job_${Date.now()}`;
   const sourceVideo = processSourceVideo({
     workspaceId,
@@ -120,7 +122,7 @@ export async function runViralClipsPipeline(input: {
     id: jobId,
     workspaceId,
     projectId: input.projectId,
-    userId: input.userId ?? "user_1",
+    userId,
     sourceUrl: input.sourceUrl,
     sourceType: validation.sourceType,
     outputFormat: input.outputFormat,

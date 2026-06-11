@@ -7,14 +7,16 @@ import { runProviderTask } from "@/lib/providers/provider-router";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { user } = await requireAuth();
-  const workspace = await requirePermission(String(body.workspace_id ?? "ws_1"), "content.create");
-  await requireRateLimit({ workspaceId: workspace.workspaceId!, userId: user.id, feature: "openai_images", route: "/api/ai/images" });
-  const usage = await canUseFeature(workspace.workspaceId ?? "ws_1", "generate_image");
+  const workspaceId = String(body.workspace_id ?? "");
+  if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
+  await requirePermission(workspaceId, "content.create");
+  await requireRateLimit({ workspaceId, userId: user.id, feature: "openai_images", route: "/api/ai/images" });
+  const usage = await canUseFeature(workspaceId, "generate_image");
   if (!usage.allowed) return NextResponse.json({ status: "blocked", error: usage.reason, usage }, { status: 402 });
 
   const result = await runProviderTask({
     type: "image",
-    workspaceId: workspace.workspaceId ?? "ws_1",
+    workspaceId,
     userId: user.id,
     prompt: body.prompt ?? "",
     style: body.style,

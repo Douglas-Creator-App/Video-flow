@@ -97,13 +97,15 @@ export async function enqueueJob(input: {
   maxAttempts?: number;
   scheduledAt?: string;
 }) {
+  if (!input.workspaceId) throw new Error("workspaceId obrigatorio para enfileirar jobs.");
+  const workspaceId = input.workspaceId;
   if (shouldUseSupabaseJobs()) return enqueueSupabaseJob(input);
   return mutateStore(async (store) => {
     const now = new Date().toISOString();
     const job: BackgroundJob = {
       id: `job_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      workspaceId: input.workspaceId ?? "ws_1",
-      userId: input.userId ?? "user_1",
+      workspaceId,
+      userId: input.userId ?? "system",
       type: input.type,
       status: "queued",
       priority: input.priority ?? 5,

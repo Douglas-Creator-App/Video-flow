@@ -11,13 +11,15 @@ export async function POST(request: NextRequest) {
   const platform = (body.platform ?? "youtube_shorts") as ExportPlatform;
   const credits = estimateQualityAnalysisCredits(mode);
   await requireAuth();
-  await requirePermission(String(body.workspace_id ?? "ws_1"), "content.create");
+  const workspaceId = String(body.workspace_id ?? "");
+  if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
+  await requirePermission(workspaceId, "content.create");
 
   await registerAuditLog({
     action: "create",
     entityType: "media_usage_logs",
     entityId: videoProjectId,
-    metadata: { action_type: "quality_analysis", mode, credits, platform }
+    metadata: { action_type: "quality_analysis", mode, credits, platform, workspace_id: workspaceId }
   });
 
   return NextResponse.json({

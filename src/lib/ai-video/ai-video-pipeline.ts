@@ -42,11 +42,12 @@ export async function runTextToVideo(input: {
   cameraMotion: CameraMotion;
   quality: "draft" | "standard" | "high";
 }): Promise<AiVideoPipelineResult> {
+  if (!input.workspaceId) throw new Error("workspaceId obrigatorio para text-to-video.");
   const cost = estimateAiVideoCost(input.provider, input.durationSeconds);
   const id = `text_video_${Date.now()}`;
   const job: TextToVideoJob = {
     id,
-    workspaceId: input.workspaceId ?? "ws_1",
+    workspaceId: input.workspaceId,
     projectId: input.projectId,
     provider: input.provider,
     prompt: input.prompt,
@@ -77,10 +78,11 @@ export async function runImageToVideo(input: {
   durationSeconds: number;
   aspectRatio: VideoAspectRatio;
 }): Promise<AiVideoPipelineResult> {
+  if (!input.workspaceId) throw new Error("workspaceId obrigatorio para image-to-video.");
   const cost = estimateAiVideoCost(input.provider, input.durationSeconds);
   const job: ImageToVideoJob = {
     id: `image_video_${Date.now()}`,
-    workspaceId: input.workspaceId ?? "ws_1",
+    workspaceId: input.workspaceId,
     videoProjectId: input.videoProjectId,
     sceneId: input.sceneId,
     provider: input.provider,
@@ -108,10 +110,11 @@ export async function runTalkingCharacter(input: {
   provider: AiVideoProviderType;
   durationSeconds: number;
 }): Promise<AiVideoPipelineResult> {
+  if (!input.workspaceId) throw new Error("workspaceId obrigatorio para talking character.");
   const cost = estimateAiVideoCost(input.provider, input.durationSeconds);
   const job: TalkingCharacterJob = {
     id: `talking_${Date.now()}`,
-    workspaceId: input.workspaceId ?? "ws_1",
+    workspaceId: input.workspaceId,
     projectId: input.projectId,
     inputImageUrl: input.inputImageUrl,
     characterDescription: input.characterDescription,
@@ -137,10 +140,11 @@ export async function runIntroOutro(input: {
   durationSeconds: number;
   aspectRatio: VideoAspectRatio;
 }): Promise<AiVideoPipelineResult> {
+  if (!input.workspaceId) throw new Error("workspaceId obrigatorio para intro/outro.");
   const cost = estimateAiVideoCost(input.provider, input.durationSeconds);
   const job: IntroOutroGeneration = {
     id: `${input.type}_${Date.now()}`,
-    workspaceId: input.workspaceId ?? "ws_1",
+    workspaceId: input.workspaceId,
     videoProjectId: input.videoProjectId,
     type: input.type,
     provider: input.provider,

@@ -21,6 +21,9 @@ export async function runProviderTask(input: {
   allowFallback?: boolean;
 }) {
   const allowFallback = input.allowFallback ?? process.env.PROVIDER_ALLOW_MOCK_FALLBACK === "true";
+  if (["tts", "image", "thumbnail"].includes(input.type) && !input.workspaceId) {
+    throw new Error("workspaceId obrigatorio para executar provider com persistencia.");
+  }
   if (input.type === "text" || input.type === "metadata" || input.type === "moderation") {
     return generateOpenAiTextStrict({
       systemPrompt: input.systemPrompt ?? "Você é o motor de conteúdo do Video Flow.",
@@ -30,7 +33,7 @@ export async function runProviderTask(input: {
   }
   if (input.type === "tts") {
     return generateTtsReal({
-      workspaceId: input.workspaceId ?? "ws_1",
+      workspaceId: input.workspaceId!,
       userId: input.userId,
       text: input.text ?? input.prompt ?? "",
       voiceId: input.voiceId,
@@ -41,7 +44,7 @@ export async function runProviderTask(input: {
   }
   if (input.type === "image" || input.type === "thumbnail") {
     return generateImagesReal({
-      workspaceId: input.workspaceId ?? "ws_1",
+      workspaceId: input.workspaceId!,
       userId: input.userId,
       prompt: input.prompt ?? "",
       style: input.style,

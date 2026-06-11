@@ -14,8 +14,10 @@ export async function POST(request: NextRequest) {
     workspaceId?: string;
   };
   const { user } = await requireAuth();
-  const workspace = await requirePermission(String(body.workspace_id ?? body.workspaceId ?? "ws_1"), "content.create");
-  await requireRateLimit({ workspaceId: workspace.workspaceId!, userId: user.id, feature: "openai_text", route: "/api/ai/generate" });
+  const workspaceId = String(body.workspace_id ?? body.workspaceId ?? "");
+  if (!workspaceId) return NextResponse.json({ status: "erro", error: "workspace_id obrigatorio." }, { status: 400 });
+  await requirePermission(workspaceId, "content.create");
+  await requireRateLimit({ workspaceId, userId: user.id, feature: "openai_text", route: "/api/ai/generate" });
 
   const providerName = body.provider ?? "openai";
   const model = body.model ?? "gpt-5.2";

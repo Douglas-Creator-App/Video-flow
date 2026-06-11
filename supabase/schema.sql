@@ -2816,6 +2816,7 @@ create policy "audit writers write smoke test video results" on public.smoke_tes
 
 insert into public.permissions (key, description) values
   ('workspace.manage', 'Manage workspace settings'),
+  ('admin.manage', 'Manage platform integrations, API keys, webhooks, and administrative platform settings'),
   ('users.invite', 'Invite users'),
   ('users.remove', 'Remove users'),
   ('roles.manage', 'Manage roles and permissions'),

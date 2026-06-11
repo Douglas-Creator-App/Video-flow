@@ -16,12 +16,14 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { user } = await requireAuth();
-  const workspace = await requirePermission(String(body.workspace_id ?? "ws_1"), "ai.generate");
-  await requireRateLimit({ workspaceId: workspace.workspaceId!, userId: user.id, feature: "jobs", route: "/api/factories/generate" });
+  const workspaceId = String(body.workspace_id ?? "");
+  if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
+  await requirePermission(workspaceId, "ai.generate");
+  await requireRateLimit({ workspaceId, userId: user.id, feature: "jobs", route: "/api/factories/generate" });
   const factoryId = body.factory_id ?? body.factoryId ?? "factory_1";
   const action = body.action ?? "generate";
   const job = await enqueueJob({
-    workspaceId: workspace.workspaceId ?? "ws_1",
+    workspaceId,
     userId: user.id,
     type: "factory_generation",
     priority: 5,

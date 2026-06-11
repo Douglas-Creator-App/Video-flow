@@ -18,10 +18,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { user } = await requireAuth();
-  if (!body.workspace_id) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
-  const workspace = await requirePermission(String(body.workspace_id), "content.create");
+  const workspaceId = String(body.workspace_id ?? "");
+  if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
+  await requirePermission(workspaceId, "content.create");
   const job = await enqueueJob({
-    workspaceId: workspace.workspaceId ?? "ws_1",
+    workspaceId,
     userId: user.id,
     type: body.type ?? "ai_generation",
     priority: body.priority ? Number(body.priority) : undefined,

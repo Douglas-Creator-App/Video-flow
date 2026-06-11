@@ -86,7 +86,8 @@ export async function searchExternalAssets(input: {
   return { providerMode: "demo" as const, results: mockExternalResults(input), warning: `${input.provider} sem provider real conectado.` };
 }
 
-export function importExternalAsset(result: ExternalAssetSearchResult, workspaceId = "ws_1") {
+export function importExternalAsset(result: ExternalAssetSearchResult, workspaceId: string) {
+  if (!workspaceId) throw new Error("workspaceId obrigatorio para importar asset.");
   const duplicate = detectDuplicateAsset({ fileUrl: result.fileUrl, title: result.title });
   if (duplicate) return { status: "duplicate" as const, asset: duplicate, warning: "Asset ja existe na biblioteca local." };
 

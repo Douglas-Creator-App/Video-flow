@@ -8,7 +8,9 @@ const allowedActions = ["create_channel", "magic_mode", "save_personal", "duplic
 export async function POST(request: NextRequest) {
   const body = await request.json();
   await requireAuth();
-  await requirePermission(String(body.workspace_id ?? "ws_1"), "workspace.manage");
+  const workspaceId = String(body.workspace_id ?? "");
+  if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
+  await requirePermission(workspaceId, "workspace.manage");
   const action = allowedActions.includes(body.action) ? body.action : "magic_mode";
   const template = getPremiumTemplate(body.template_id ?? "");
 

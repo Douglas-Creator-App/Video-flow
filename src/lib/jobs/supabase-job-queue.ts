@@ -59,11 +59,12 @@ export async function enqueueSupabaseJob(input: {
   maxAttempts?: number;
   scheduledAt?: string;
 }) {
+  if (!input.workspaceId) throw new Error("workspaceId obrigatorio para criar job no Supabase.");
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("background_jobs")
     .insert({
-      workspace_id: input.workspaceId ?? "ws_1",
+      workspace_id: input.workspaceId,
       user_id: input.userId ?? null,
       type: input.type,
       priority: input.priority ?? 5,
