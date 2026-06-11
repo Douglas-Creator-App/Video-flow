@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowRight, CheckCircle2, ChevronDown, Copy, Film, Gauge, Layers3, Loader2, Music2, Play, Radio, Sparkles, Wand2 } from "lucide-react";
+import { CheckCircle2, ChevronDown, Film, Gauge, Layers3, Loader2, Radio, Sparkles, Wand2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,13 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectField } from "@/components/ui/select-field";
 import { magicSteps } from "@/lib/magic/magic-pipeline";
-import { aiVideoProviders, magicTemplates, musicTracks, premiumTemplates, projects, visualStylePresets, voices } from "@/lib/mock-data";
+import { aiVideoProviders, magicTemplates, premiumTemplates, projects, visualStylePresets, voices } from "@/lib/mock-data";
 import type {
   MagicAdvancedSettings,
   MagicCostEstimate,
   MagicDurationTarget,
   MagicNarrativeType,
-  MagicPipelineResult,
   MagicVideoFormat,
   MagicVisualSource,
   MagicVisualStyle
@@ -92,6 +91,15 @@ const visualStyles: Array<{ value: MagicVisualStyle; label: string }> = [
   { value: "minimalista", label: "Minimalista" }
 ];
 
+type MagicQueuedResult = {
+  status: "queued";
+  job_id: string;
+  polling_url: string;
+  magic_url: string;
+  cost_estimate: MagicCostEstimate;
+  warning?: string;
+};
+
 export function MagicMode() {
   const { currentWorkspace } = useWorkspaceProvider();
   const workspaceId = currentWorkspace?.id ?? "";
@@ -117,7 +125,7 @@ export function MagicMode() {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [result, setResult] = useState<MagicPipelineResult | null>(null);
+  const [result, setResult] = useState<MagicQueuedResult | null>(null);
   const [estimate, setEstimate] = useState<MagicCostEstimate | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [advanced, setAdvanced] = useState<MagicAdvancedSettings>({
@@ -197,7 +205,7 @@ export function MagicMode() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Falha ao gerar o Magic Job.");
       setResult(data);
-      setEstimate(data.costEstimate);
+      setEstimate(data.cost_estimate);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Falha ao gerar o Magic Job.");
     } finally {
@@ -207,7 +215,7 @@ export function MagicMode() {
 
   function cancelGeneration() {
     setIsGenerating(false);
-    setErrorMessage("Job cancelado antes de concluir. Nenhum credito foi consumido nesta simulacao.");
+    setErrorMessage("A criacao local foi interrompida antes do envio. Jobs ja enfileirados devem ser cancelados pela fila.");
   }
 
   function payload(preview: boolean) {
@@ -249,9 +257,9 @@ export function MagicMode() {
 
       <TooltipHint title="Escolha um tema e o sistema cria o video" description="Magic Mode usa template, voz, visual, assets, thumbnail e render base para transformar uma ideia em um projeto editavel." />
 
-      <div className="rounded-md border border-amber-400/20 bg-amber-400/10 p-3 text-sm text-amber-200">
-        <p className="font-semibold text-foreground">Modo demo/mock visivel</p>
-        <p className="mt-1">Roteiro, voz, imagens e render podem usar providers simulados enquanto as chaves reais nao estiverem configuradas. O sistema nao deve cobrar render/export final sem artefato verificado.</p>
+      <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
+        <p className="font-semibold text-foreground">Pipeline real por worker</p>
+        <p className="mt-1">O Magic cria um job real, reserva creditos e so conclui quando TTS, imagens e persistencia no Supabase terminarem sem fallback mockado.</p>
       </div>
 
       <section className="grid gap-4 xl:grid-cols-[1fr_420px]">
@@ -333,8 +341,8 @@ export function MagicMode() {
           </Card>
           <Card className="border-primary/20 bg-primary/5 shadow-[inset_0_1px_0_rgb(255_255_255/.06)]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" />Fallback seguro</CardTitle>
-              <CardDescription>Sem API configurada, o fluxo usa provider mockado para continuar funcionando.</CardDescription>
+              <CardTitle className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" />Execucao real</CardTitle>
+              <CardDescription>Sem provider ou storage configurado, o worker falha com erro claro e os creditos reservados sao estornados.</CardDescription>
             </CardHeader>
           </Card>
         </aside>
@@ -472,13 +480,13 @@ function CostEstimate({ estimate }: { estimate: MagicCostEstimate }) {
   );
 }
 
-function ProgressCard({ isGenerating, result, onCancel }: { isGenerating: boolean; result: MagicPipelineResult | null; onCancel: () => void }) {
-  const activeProgress = result?.job.progress ?? (isGenerating ? 58 : 0);
+function ProgressCard({ isGenerating, result, onCancel }: { isGenerating: boolean; result: MagicQueuedResult | null; onCancel: () => void }) {
+  const activeProgress = result ? 5 : (isGenerating ? 3 : 0);
   return (
     <Card className="border-primary/20">
       <CardHeader>
         <CardTitle className="flex items-center gap-2"><Film className="h-4 w-4 text-primary" />Progresso em tempo real</CardTitle>
-        <CardDescription>Estrutura pronta para Supabase Realtime; nesta base o job roda com fallback instantaneo.</CardDescription>
+        <CardDescription>O Magic cria um job real. O processamento acontece no worker e os logs aparecem no acompanhamento.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="h-2 overflow-hidden rounded-full bg-secondary">
@@ -495,51 +503,35 @@ function ProgressCard({ isGenerating, result, onCancel }: { isGenerating: boolea
             );
           })}
         </div>
-        {isGenerating ? <Button variant="outline" className="w-full" onClick={onCancel}>Cancelar job</Button> : null}
+        {result ? <Button asChild className="w-full"><Link href={result.magic_url}>Acompanhar job real</Link></Button> : null}
+        {isGenerating ? <Button variant="outline" className="w-full" onClick={onCancel}>Interromper envio</Button> : null}
       </CardContent>
     </Card>
   );
 }
 
-function ResultPanel({ result }: { result: MagicPipelineResult }) {
+function ResultPanel({ result }: { result: MagicQueuedResult }) {
   return (
     <Card className="border-primary/25 bg-gradient-to-br from-primary/10 to-card">
       <CardHeader>
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <Badge>ready_for_editor</Badge>
-            <CardTitle className="mt-3 text-2xl">{result.videoProject.title}</CardTitle>
-            <CardDescription>{result.videoScenes.length} cenas, {result.subtitles.length} legendas e {result.costEstimate.totalCredits} creditos estimados.</CardDescription>
+            <Badge>{result.status}</Badge>
+            <CardTitle className="mt-3 text-2xl">Magic Job enfileirado</CardTitle>
+            <CardDescription>{result.cost_estimate.totalCredits} creditos reservados. O editor sera liberado quando o worker persistir o video_project real.</CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button asChild><Link href={`/app/videos/${result.videoProject.id}/editor`}>Abrir no editor <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
-            <Button variant="outline" asChild><Link href={`/app/videos/${result.videoProject.id}/thumbnails`}>Thumbnail</Link></Button>
+            <Button asChild><Link href={result.magic_url}>Acompanhar Magic Job</Link></Button>
+            <Button variant="outline" asChild><Link href="/app/queue">Abrir fila</Link></Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="grid gap-4 lg:grid-cols-[320px_1fr]">
-        <div className="grid aspect-[9/16] place-items-center overflow-hidden rounded-lg border border-primary/20 bg-black/70">
-          {result.thumbnailUrl ? <img src={result.thumbnailUrl} alt="Thumbnail sugerida" className="h-full w-full object-cover" /> : <Sparkles className="h-10 w-10 text-primary" />}
-        </div>
-        <div className="space-y-4">
-          <div className="grid gap-2 md:grid-cols-3">
-            <Button variant="outline" className="gap-2" asChild><Link href={`/app/videos/${result.videoProject.id}/editor`}><Play className="h-4 w-4" />Preview no editor</Link></Button>
-            <Button variant="outline" className="gap-2" asChild><Link href={`/app/videos/${result.videoProject.id}/editor`}><Film className="h-4 w-4" />Renderizar no editor</Link></Button>
-            <Button variant="outline" className="gap-2" disabled><Copy className="h-4 w-4" />Duplicar indisponivel</Button>
-          </div>
-          <div className="grid gap-2">
-            {result.videoScenes.slice(0, 6).map((scene) => (
-              <div key={scene.id} className="rounded-md border border-white/5 bg-secondary/40 p-3">
-                <p className="text-xs text-primary">Cena {scene.orderIndex} - {scene.motionType} - {scene.transitionType}</p>
-                <p className="mt-1 text-sm text-foreground">{scene.scriptText}</p>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-md border border-white/5 bg-secondary/40 p-3 text-sm text-muted-foreground">
-            <p className="mb-2 flex items-center gap-2 font-semibold text-foreground"><Music2 className="h-4 w-4 text-primary" />Musica sugerida</p>
-            {musicTracks[0]?.title ?? "Trilha placeholder"}
-          </div>
-        </div>
+      <CardContent className="grid gap-3 md:grid-cols-4">
+        <ReviewItem label="Job" value={result.job_id} />
+        <ReviewItem label="Texto" value={`${result.cost_estimate.textCost} cr`} />
+        <ReviewItem label="Voz" value={`${result.cost_estimate.voiceCost} cr`} />
+        <ReviewItem label="Imagens" value={`${result.cost_estimate.imageCost} cr`} />
+        {result.warning ? <p className="rounded-md border border-amber-400/20 bg-amber-400/10 p-3 text-sm text-amber-100 md:col-span-4">{result.warning}</p> : null}
       </CardContent>
     </Card>
   );

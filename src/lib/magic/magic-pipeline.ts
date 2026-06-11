@@ -1,4 +1,5 @@
 import { generateOpenAiImage, generateOpenAiSpeech } from "@/lib/media/openai-media";
+import { generateText } from "@/lib/providers/openai-text";
 import type {
   MagicAdvancedSettings,
   MagicCostEstimate,
@@ -101,28 +102,6 @@ export function estimateMagicCost(input: {
   };
 }
 
-export function generateMockScript(input: {
-  theme: string;
-  narrativeType: MagicNarrativeType;
-  durationSeconds: number;
-  settings: MagicAdvancedSettings;
-}) {
-  if (input.narrativeType === "roteiro_personalizado" && input.settings.customScript?.trim()) {
-    return input.settings.customScript.trim();
-  }
-
-  const instruction = narrativeInstructions[input.narrativeType];
-  const cta = input.settings.cta || "Abra no editor, ajuste os detalhes e publique com consistencia.";
-  return [
-    `Gancho: ${input.theme} pode parecer simples, mas existe um detalhe que muda todo o resultado.`,
-    `Contexto: ${instruction}`,
-    `Desenvolvimento: Primeiro, apresente o problema de forma visual. Depois, mostre o mecanismo principal por tras do tema. Em seguida, traga um exemplo claro para manter o video concreto.`,
-    `Virada: O ponto que a maioria ignora e que o video precisa revelar e a relacao entre percepcao, ritmo e decisao.`,
-    `Fechamento: transforme a ideia em um passo pratico para o publico aplicar hoje.`,
-    `CTA: ${cta}`
-  ].join("\n\n");
-}
-
 export function splitScriptIntoScenes(input: {
   script: string;
   durationSeconds: number;
@@ -156,6 +135,53 @@ export function generateSceneVisualPrompts(scenes: MagicScenePlan[], visualStyle
   }));
 }
 
+async function generateRealMagicScript(input: {
+  theme: string;
+  narrativeType: MagicNarrativeType;
+  durationSeconds: number;
+  format: MagicVideoFormat;
+  visualStyle: MagicVisualStyle;
+  settings: MagicAdvancedSettings;
+}) {
+  if (input.narrativeType === "roteiro_personalizado" && input.settings.customScript?.trim()) {
+    return input.settings.customScript.trim();
+  }
+
+  const instruction = narrativeInstructions[input.narrativeType];
+  const response = await generateText({
+    systemPrompt: [
+      "Voce e um roteirista senior da plataforma Video Flow.",
+      "Crie roteiros claros, ritmados e prontos para virar cenas de video.",
+      "Nao use markdown complexo. Entregue blocos curtos e narraveis.",
+      "Evite promessas falsas, dados inventados e claims medicos/financeiros sem ressalva."
+    ].join("\n"),
+    userPrompt: [
+      `Tema: ${input.theme}`,
+      `Formato: ${input.format}`,
+      `Duracao alvo: ${input.durationSeconds} segundos`,
+      `Narrativa: ${input.narrativeType}`,
+      `Direcao narrativa: ${instruction}`,
+      `Estilo visual: ${input.visualStyle}`,
+      `Idioma: ${input.settings.language}`,
+      `Publico: ${input.settings.targetAudience}`,
+      `Tom: ${input.settings.narrationTone}`,
+      `CTA: ${input.settings.cta || "Convide a pessoa a continuar acompanhando o canal."}`,
+      input.settings.scriptInstructions ? `Instrucoes extras: ${input.settings.scriptInstructions}` : "",
+      input.settings.forbiddenWords ? `Palavras proibidas: ${input.settings.forbiddenWords}` : "",
+      "Estrutura obrigatoria: gancho forte, contexto, desenvolvimento em progressao, virada e CTA final."
+    ].filter(Boolean).join("\n"),
+    model: "gpt-4.1-mini",
+    temperature: 0.75,
+    maxTokens: Math.max(700, Math.min(2200, Math.round(input.durationSeconds * 7)))
+  });
+
+  if (response.providerMode !== "real") {
+    throw new Error(response.warning ?? "OpenAI Text real indisponivel. Configure OPENAI_API_KEY antes de executar o Magic Mode real.");
+  }
+
+  return response.text.trim();
+}
+
 export async function runMagicVideoPipeline(input: {
   workspaceId?: string;
   projectId: string;
@@ -186,13 +212,15 @@ export async function runMagicVideoPipeline(input: {
     autoThumbnail: input.autoThumbnail
   });
 
-  const script = generateMockScript({
+  const script = await generateRealMagicScript({
     theme: input.theme,
     narrativeType: input.narrativeType,
     durationSeconds,
+    format: input.format,
+    visualStyle: input.visualStyle,
     settings: input.advancedSettings
   });
-  logs.push("Roteiro criado ou roteiro personalizado preservado");
+  logs.push("Roteiro criado com OpenAI Text real ou roteiro personalizado preservado");
 
   const scenePlans = generateSceneVisualPrompts(
     splitScriptIntoScenes({

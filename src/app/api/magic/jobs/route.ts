@@ -1,14 +1,37 @@
-﻿import { NextResponse, type NextRequest } from "next/server";
-import { magicVideoJobs } from "@/lib/mock-data";
+import { NextResponse, type NextRequest } from "next/server";
 import { requireAuth, requirePermission, requireRateLimit } from "@/lib/auth";
 import { canUseFeature } from "@/lib/billing";
-import { enqueueJob } from "@/lib/jobs/job-queue";
+import { enqueueJob, getJobs } from "@/lib/jobs/job-queue";
 import { estimateMagicCost, secondsFromDuration } from "@/lib/magic/magic-pipeline";
 import type { MagicAdvancedSettings, MagicDurationTarget } from "@/lib/types";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   await requireAuth();
-  return NextResponse.json({ jobs: magicVideoJobs });
+  const workspaceId = request.nextUrl.searchParams.get("workspace_id");
+  if (!workspaceId) return NextResponse.json({ error: "workspace_id obrigatorio." }, { status: 400 });
+  await requirePermission(workspaceId, "content.create");
+  const jobs = await getJobs({ workspaceId, type: "magic_video" });
+
+  return NextResponse.json({
+    jobs: jobs.map((job) => ({
+      id: job.id,
+      workspaceId: job.workspaceId,
+      userId: job.userId,
+      status: job.status,
+      progress: job.progress,
+      currentStep: job.currentStep,
+      theme: String(job.payload.theme ?? "Magic Video"),
+      projectId: String(job.payload.project_id ?? ""),
+      format: String(job.payload.format ?? "reels"),
+      aspectRatio: String(readNested(job.result, ["videoProject", "aspectRatio"]) ?? ""),
+      durationTarget: Number(job.payload.duration_seconds ?? 0),
+      costCredits: Number(job.payload.required_credits ?? 0),
+      videoProjectId: resolveVideoProjectId(job.result),
+      errorMessage: job.errorMessage,
+      createdAt: job.createdAt,
+      updatedAt: job.updatedAt
+    }))
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -17,7 +40,7 @@ export async function POST(request: NextRequest) {
   if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
   const advancedSettings = normalizeAdvancedSettings(body.advanced_settings);
   const { user } = await requireAuth();
-  const workspace = await requirePermission(workspaceId, "content.create");
+  await requirePermission(workspaceId, "content.create");
   const durationTarget = (body.duration_target ?? "60s") as MagicDurationTarget;
   const durationSeconds = secondsFromDuration(durationTarget, advancedSettings.customDurationSeconds);
   const sceneCount = advancedSettings.sceneCount || Math.max(5, Math.round(durationSeconds / 8));
@@ -77,6 +100,7 @@ export async function POST(request: NextRequest) {
     status: "queued",
     job_id: job.id,
     polling_url: `/api/jobs/${job.id}`,
+    magic_url: `/app/magic/${job.id}`,
     cost_estimate: costEstimate,
     usage,
     worker_required: true,
@@ -104,3 +128,18 @@ function normalizeAdvancedSettings(settings: Partial<MagicAdvancedSettings> | un
   };
 }
 
+function resolveVideoProjectId(result?: Record<string, unknown>) {
+  const direct = result?.videoProjectId ?? result?.video_project_id;
+  if (direct) return String(direct);
+  const nested = readNested(result, ["videoProject", "id"]);
+  return nested ? String(nested) : undefined;
+}
+
+function readNested(source: unknown, path: string[]) {
+  let current = source;
+  for (const key of path) {
+    if (!current || typeof current !== "object" || !(key in current)) return undefined;
+    current = (current as Record<string, unknown>)[key];
+  }
+  return current;
+}
