@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Film, Gauge, Loader2, Scissors, ShieldCheck, Sparkles } from "lucide-react";
+import { AlertTriangle, Film, Gauge, Loader2, Scissors, ShieldCheck, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectField } from "@/components/ui/select-field";
 import { useWorkspaceProvider } from "@/components/workspace/workspace-provider";
-import { projects } from "@/lib/mock-data";
 import { viralSteps } from "@/lib/viral/viral-clips-pipeline";
-import type { ReframeMode, ViralClipDurationMode, ViralClipOutputFormat, ViralClipPipelineResult, ViralCostEstimate, ViralSubtitleStyle } from "@/lib/types";
+import type { ReframeMode, ViralClipDurationMode, ViralClipOutputFormat, ViralCostEstimate, ViralSubtitleStyle } from "@/lib/types";
 
 const outputFormats: Array<{ value: ViralClipOutputFormat; label: string }> = [
   { value: "shorts", label: "Shorts 9:16" },
@@ -46,11 +45,21 @@ const reframeModes: Array<{ value: ReframeMode; label: string }> = [
   { value: "blurred_background", label: "Fundo desfocado" }
 ];
 
+type ViralQueuedResult = {
+  status: string;
+  job_id: string;
+  viral_clip_job_id?: string | null;
+  review_url?: string;
+  polling_url?: string;
+  warning?: string;
+  cost_estimate?: ViralCostEstimate;
+};
+
 export function ViralClipsStudio() {
   const { currentWorkspace } = useWorkspaceProvider();
   const workspaceId = currentWorkspace?.id ?? "";
-  const [projectId, setProjectId] = useState(projects[0]?.id ?? "project_1");
-  const [sourceUrl, setSourceUrl] = useState("https://www.youtube.com/watch?v=video-flow-demo");
+  const [projectId, setProjectId] = useState("");
+  const [sourceUrl, setSourceUrl] = useState("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
   const [outputFormat, setOutputFormat] = useState<ViralClipOutputFormat>("shorts");
   const [clipDurationMode, setClipDurationMode] = useState<ViralClipDurationMode>("30s");
   const [clipDurationSeconds, setClipDurationSeconds] = useState(30);
@@ -61,7 +70,7 @@ export function ViralClipsStudio() {
   const [reframeMode, setReframeMode] = useState<ReframeMode>("blurred_background");
   const [rightsConfirmed, setRightsConfirmed] = useState(false);
   const [estimate, setEstimate] = useState<ViralCostEstimate | null>(null);
-  const [result, setResult] = useState<ViralClipPipelineResult | null>(null);
+  const [result, setResult] = useState<ViralQueuedResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -98,7 +107,7 @@ export function ViralClipsStudio() {
     if (!response.ok) setError(data.error ?? "Erro ao criar job.");
     else {
       setResult(data);
-      setEstimate(data.costEstimate);
+      setEstimate(data.cost_estimate);
     }
     setLoading(false);
   }
@@ -139,7 +148,7 @@ export function ViralClipsStudio() {
             <CardDescription>Cole uma URL do YouTube, revise custo, gere momentos sugeridos e renderize cortes para Shorts, Reels ou TikTok.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 pt-5 lg:grid-cols-2">
-            <Field label="Projeto"><SelectField value={projectId} onChange={(event) => setProjectId(event.target.value)}>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</SelectField></Field>
+            <Field label="Projeto real (opcional)"><Input value={projectId} onChange={(event) => setProjectId(event.target.value)} placeholder="UUID do projeto" /></Field>
             <Field label="Link do YouTube"><Input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} /></Field>
             <Field label="Formato de saida"><SelectField value={outputFormat} onChange={(event) => setOutputFormat(event.target.value as ViralClipOutputFormat)}>{outputFormats.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SelectField></Field>
             <Field label="Duracao dos cortes"><SelectField value={clipDurationMode} onChange={(event) => setClipDurationMode(event.target.value as ViralClipDurationMode)}>{durationModes.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</SelectField></Field>
@@ -179,7 +188,7 @@ export function ViralClipsStudio() {
               <Button asChild variant="outline" className="w-full"><Link href="/app/viral-clips/library">Abrir biblioteca</Link></Button>
             </CardContent>
           </Card>
-          <Progress progress={result?.job.progress ?? 0} />
+          <Progress progress={result ? 8 : 0} />
         </aside>
       </section>
 
@@ -233,20 +242,27 @@ function Progress({ progress }: { progress: number }) {
   );
 }
 
-function ResultPanel({ result }: { result: ViralClipPipelineResult }) {
+function ResultPanel({ result }: { result: ViralQueuedResult }) {
   return (
     <Card className="border-primary/25 bg-primary/5">
       <CardHeader>
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div><Badge>{result.job.status}</Badge><CardTitle className="mt-3">{result.sourceVideo.title}</CardTitle><CardDescription>{result.moments.length} momentos sugeridos, {result.clips.length} cortes renderizados.</CardDescription></div>
+          <div>
+            <Badge>{result.status}</Badge>
+            <CardTitle className="mt-3">Job de cortes enfileirado</CardTitle>
+            <CardDescription>{result.warning ?? "O worker processara transcricao, analise e render reais quando os adapters estiverem configurados."}</CardDescription>
+          </div>
           <div className="flex flex-wrap gap-2">
-            <Button asChild><Link href={`/app/viral-clips/${result.job.id}/review`}>Revisar cortes</Link></Button>
+            <Button asChild><Link href={result.review_url ?? "/app/queue"}>Revisar cortes</Link></Button>
+            <Button asChild variant="outline"><Link href="/app/queue">Ver fila</Link></Button>
             <Button asChild variant="outline"><Link href="/app/viral-clips/library">Biblioteca</Link></Button>
           </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-3 md:grid-cols-3">
-        {result.moments.slice(0, 3).map((moment) => <div key={moment.id} className="rounded-md border border-white/5 bg-secondary/40 p-3"><p className="text-sm font-semibold">{moment.title}</p><p className="mt-1 text-xs text-muted-foreground">{moment.hook}</p><p className="mt-2 text-xs text-primary">Score {moment.viralScore}</p></div>)}
+        <div className="rounded-md border border-white/5 bg-secondary/40 p-3"><p className="text-sm font-semibold">Background job</p><p className="mt-1 text-xs text-muted-foreground">{result.job_id}</p></div>
+        <div className="rounded-md border border-white/5 bg-secondary/40 p-3"><p className="text-sm font-semibold">Job viral</p><p className="mt-1 text-xs text-muted-foreground">{result.viral_clip_job_id ?? "Supabase nao configurado"}</p></div>
+        <div className="rounded-md border border-white/5 bg-secondary/40 p-3"><p className="text-sm font-semibold">Status real</p><p className="mt-1 text-xs text-muted-foreground">Sem arquivo demonstrativo ou sucesso falso.</p></div>
       </CardContent>
     </Card>
   );
