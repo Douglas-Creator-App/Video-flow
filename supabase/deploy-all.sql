@@ -1,3 +1,11 @@
+-- Video Flow Supabase deploy bundle
+-- Generated from local SQL files in dependency order.
+-- Target: clean Supabase project.
+
+
+-- ============================================================
+-- Source: supabase\schema.sql
+-- ============================================================
 create extension if not exists "pgcrypto";
 
 create table if not exists public.user_profiles (
@@ -149,7 +157,7 @@ create table if not exists public.content_items (
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
   project_id uuid not null references public.projects(id) on delete cascade,
   folder_id uuid references public.content_folders(id) on delete set null,
-  type text not null check (type in ('Ideia', 'Roteiro', 'Artigo', 'Carrossel', 'VÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­deo', 'Shorts', 'Reels', 'Email', 'Copy', 'AnÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºncio')),
+  type text not null check (type in ('Ideia', 'Roteiro', 'Artigo', 'Carrossel', 'VÃƒÂ­deo', 'Shorts', 'Reels', 'Email', 'Copy', 'AnÃƒÂºncio')),
   title text not null,
   description text,
   category text not null,
@@ -190,7 +198,7 @@ create table if not exists public.trends (
   main_keyword text not null,
   estimated_volume integer not null default 0,
   estimated_growth integer not null default 0,
-  competition_level text not null check (competition_level in ('baixa', 'mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©dia', 'alta')),
+  competition_level text not null check (competition_level in ('baixa', 'mÃƒÂ©dia', 'alta')),
   viral_potential integer not null default 0 check (viral_potential between 0 and 100),
   discovered_at date not null default current_date,
   status text not null default 'nova' check (status in ('nova', 'analisada', 'aprovada', 'descartada', 'transformada em ideia')),
@@ -248,8 +256,8 @@ create table if not exists public.content_ideas (
   hook text,
   angle text,
   objective text not null check (objective in ('awareness', 'engagement', 'lead_generation', 'sales', 'authority', 'education', 'retention')),
-  funnel_stage text not null check (funnel_stage in ('topo', 'meio', 'fundo', 'pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³s-venda')),
-  status text not null default 'rascunho' check (status in ('rascunho', 'em_anÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lise', 'aprovada', 'em_produÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o', 'produzida', 'publicada', 'arquivada', 'descartada')),
+  funnel_stage text not null check (funnel_stage in ('topo', 'meio', 'fundo', 'pÃƒÂ³s-venda')),
+  status text not null default 'rascunho' check (status in ('rascunho', 'em_anÃƒÂ¡lise', 'aprovada', 'em_produÃƒÂ§ÃƒÂ£o', 'produzida', 'publicada', 'arquivada', 'descartada')),
   tags text[] not null default '{}',
   notes text,
   created_by uuid references auth.users(id) on delete set null,
@@ -316,7 +324,7 @@ create table if not exists public.prompt_templates (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
   name text not null,
-  category text not null check (category in ('roteiro', 'tÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­tulo', 'gancho', 'carrossel', 'artigo', 'email', 'anÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºncio', 'whatsapp', 'descriÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o youtube', 'seo')),
+  category text not null check (category in ('roteiro', 'tÃƒÂ­tulo', 'gancho', 'carrossel', 'artigo', 'email', 'anÃƒÂºncio', 'whatsapp', 'descriÃƒÂ§ÃƒÂ£o youtube', 'seo')),
   description text,
   prompt_system text not null,
   prompt_user text not null,
@@ -342,7 +350,7 @@ create table if not exists public.ai_generations (
   output_tokens integer not null default 0,
   cost numeric(12,6) not null default 0,
   duration_ms integer not null default 0,
-  status text not null default 'aguardando' check (status in ('aguardando', 'processando', 'concluÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­do', 'erro')),
+  status text not null default 'aguardando' check (status in ('aguardando', 'processando', 'concluÃƒÂ­do', 'erro')),
   error_message text,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
@@ -353,7 +361,7 @@ create table if not exists public.ai_generation_jobs (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
   generation_id uuid references public.ai_generations(id) on delete cascade,
-  status text not null default 'aguardando' check (status in ('aguardando', 'processando', 'concluÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­do', 'erro')),
+  status text not null default 'aguardando' check (status in ('aguardando', 'processando', 'concluÃƒÂ­do', 'erro')),
   payload jsonb not null default '{}'::jsonb,
   attempts integer not null default 0,
   started_at timestamptz,
@@ -2299,83 +2307,70 @@ as $$
       and wu.status = 'active'
       and p.key = permission_key
   );
-$$;drop policy if exists "profiles are visible to signed users" on public.user_profiles;
-
+$$;
 
 create policy "profiles are visible to signed users"
 on public.user_profiles for select
 to authenticated
-using (true);drop policy if exists "users update own profile" on public.user_profiles;
-
+using (true);
 
 create policy "users update own profile"
 on public.user_profiles for update
 to authenticated
 using (id = auth.uid())
-with check (id = auth.uid());drop policy if exists "users create own profile" on public.user_profiles;
-
+with check (id = auth.uid());
 
 create policy "users create own profile"
 on public.user_profiles for insert
 to authenticated
-with check (id = auth.uid());drop policy if exists "members read workspaces" on public.workspaces;
-
+with check (id = auth.uid());
 
 create policy "members read workspaces"
 on public.workspaces for select
 to authenticated
-using (public.is_workspace_member(id));drop policy if exists "owners create workspaces" on public.workspaces;
-
+using (public.is_workspace_member(id));
 
 create policy "owners create workspaces"
 on public.workspaces for insert
 to authenticated
-with check (owner_id = auth.uid());drop policy if exists "workspace managers update workspaces" on public.workspaces;
-
+with check (owner_id = auth.uid());
 
 create policy "workspace managers update workspaces"
 on public.workspaces for update
 to authenticated
 using (public.has_workspace_permission(id, 'workspace.manage'))
-with check (public.has_workspace_permission(id, 'workspace.manage'));drop policy if exists "members read workspace users" on public.workspace_users;
-
+with check (public.has_workspace_permission(id, 'workspace.manage'));
 
 create policy "members read workspace users"
 on public.workspace_users for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "admins invite users" on public.workspace_users;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "admins invite users"
 on public.workspace_users for insert
 to authenticated
-with check (public.has_workspace_permission(workspace_id, 'users.invite'));drop policy if exists "admins remove users" on public.workspace_users;
-
+with check (public.has_workspace_permission(workspace_id, 'users.invite'));
 
 create policy "admins remove users"
 on public.workspace_users for delete
 to authenticated
-using (public.has_workspace_permission(workspace_id, 'users.remove'));drop policy if exists "members read roles" on public.roles;
-
+using (public.has_workspace_permission(workspace_id, 'users.remove'));
 
 create policy "members read roles"
 on public.roles for select
 to authenticated
-using (workspace_id is null or public.is_workspace_member(workspace_id));drop policy if exists "role managers write roles" on public.roles;
-
+using (workspace_id is null or public.is_workspace_member(workspace_id));
 
 create policy "role managers write roles"
 on public.roles for all
 to authenticated
 using (workspace_id is not null and public.has_workspace_permission(workspace_id, 'roles.manage'))
-with check (workspace_id is not null and public.has_workspace_permission(workspace_id, 'roles.manage'));drop policy if exists "authenticated read permissions" on public.permissions;
-
+with check (workspace_id is not null and public.has_workspace_permission(workspace_id, 'roles.manage'));
 
 create policy "authenticated read permissions"
 on public.permissions for select
 to authenticated
-using (true);drop policy if exists "members read role permissions" on public.role_permissions;
-
+using (true);
 
 create policy "members read role permissions"
 on public.role_permissions for select
@@ -2386,8 +2381,7 @@ using (
     where r.id = role_id
       and (r.workspace_id is null or public.is_workspace_member(r.workspace_id))
   )
-);drop policy if exists "role managers write role permissions" on public.role_permissions;
-
+);
 
 create policy "role managers write role permissions"
 on public.role_permissions for all
@@ -2407,789 +2401,561 @@ with check (
       and r.workspace_id is not null
       and public.has_workspace_permission(r.workspace_id, 'roles.manage')
   )
-);drop policy if exists "members create audit logs" on public.audit_logs;
-
+);
 
 create policy "members create audit logs"
 on public.audit_logs for insert
 to authenticated
-with check (workspace_id is null or public.is_workspace_member(workspace_id));drop policy if exists "auditors read audit logs" on public.audit_logs;
-
+with check (workspace_id is null or public.is_workspace_member(workspace_id));
 
 create policy "auditors read audit logs"
 on public.audit_logs for select
 to authenticated
-using (workspace_id is not null and public.has_workspace_permission(workspace_id, 'audit.read'));drop policy if exists "members read projects" on public.projects;
-
+using (workspace_id is not null and public.has_workspace_permission(workspace_id, 'audit.read'));
 
 create policy "members read projects"
 on public.projects for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "project creators create projects" on public.projects;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "project creators create projects"
 on public.projects for insert
 to authenticated
-with check (public.has_workspace_permission(workspace_id, 'projects.create'));drop policy if exists "project editors update projects" on public.projects;
-
+with check (public.has_workspace_permission(workspace_id, 'projects.create'));
 
 create policy "project editors update projects"
 on public.projects for update
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'projects.update'))
-with check (public.has_workspace_permission(workspace_id, 'projects.update'));drop policy if exists "project editors delete projects" on public.projects;
-
+with check (public.has_workspace_permission(workspace_id, 'projects.update'));
 
 create policy "project editors delete projects"
 on public.projects for delete
 to authenticated
-using (public.has_workspace_permission(workspace_id, 'projects.update'));drop policy if exists "members read niches" on public.niches;
-
+using (public.has_workspace_permission(workspace_id, 'projects.update'));
 
 create policy "members read niches"
 on public.niches for select
 to authenticated
-using (workspace_id is null or public.is_workspace_member(workspace_id));drop policy if exists "library managers write niches" on public.niches;
-
+using (workspace_id is null or public.is_workspace_member(workspace_id));
 
 create policy "library managers write niches"
 on public.niches for all
 to authenticated
 using (workspace_id is not null and public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (workspace_id is not null and public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read personas" on public.personas;
-
+with check (workspace_id is not null and public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "members read personas"
 on public.personas for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write personas" on public.personas;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write personas"
 on public.personas for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read keywords" on public.keywords;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read keywords"
 on public.keywords for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write keywords" on public.keywords;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "library managers write keywords"
 on public.keywords for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read tags" on public.tags;
-
+with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "members read tags"
 on public.tags for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write tags" on public.tags;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "library managers write tags"
 on public.tags for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read content folders" on public.content_folders;
-
+with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "members read content folders"
 on public.content_folders for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write content folders" on public.content_folders;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "library managers write content folders"
 on public.content_folders for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read content items" on public.content_items;
-
+with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "members read content items"
 on public.content_items for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators create content items" on public.content_items;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators create content items"
 on public.content_items for insert
 to authenticated
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "content creators update content items" on public.content_items;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "content creators update content items"
 on public.content_items for update
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "content creators delete content items" on public.content_items;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "content creators delete content items"
 on public.content_items for delete
 to authenticated
-using (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read content tags" on public.content_item_tags;
-
+using (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read content tags"
 on public.content_item_tags for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write content tags" on public.content_item_tags;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "library managers write content tags"
 on public.content_item_tags for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "users read own favorites" on public.favorites;
-
+with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "users read own favorites"
 on public.favorites for select
 to authenticated
-using (public.is_workspace_member(workspace_id) and user_id = auth.uid());drop policy if exists "users write own favorites" on public.favorites;
-
+using (public.is_workspace_member(workspace_id) and user_id = auth.uid());
 
 create policy "users write own favorites"
 on public.favorites for all
 to authenticated
 using (public.is_workspace_member(workspace_id) and user_id = auth.uid())
-with check (public.is_workspace_member(workspace_id) and user_id = auth.uid());drop policy if exists "members read trends" on public.trends;
-
+with check (public.is_workspace_member(workspace_id) and user_id = auth.uid());
 
 create policy "members read trends"
 on public.trends for select
 to authenticated
-using (public.is_workspace_member(workspace_id) and deleted_at is null);drop policy if exists "library managers write trends" on public.trends;
-
+using (public.is_workspace_member(workspace_id) and deleted_at is null);
 
 create policy "library managers write trends"
 on public.trends for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read competitors" on public.competitors;
-
+with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "members read competitors"
 on public.competitors for select
 to authenticated
-using (public.is_workspace_member(workspace_id) and deleted_at is null);drop policy if exists "library managers write competitors" on public.competitors;
-
+using (public.is_workspace_member(workspace_id) and deleted_at is null);
 
 create policy "library managers write competitors"
 on public.competitors for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read competitor insights" on public.competitor_insights;
-
+with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "members read competitor insights"
 on public.competitor_insights for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write competitor insights" on public.competitor_insights;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "library managers write competitor insights"
 on public.competitor_insights for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'library.manage'))
-with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read content ideas" on public.content_ideas;
-
+with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
 create policy "members read content ideas"
 on public.content_ideas for select
 to authenticated
-using (public.is_workspace_member(workspace_id) and deleted_at is null);drop policy if exists "content creators write content ideas" on public.content_ideas;
-
+using (public.is_workspace_member(workspace_id) and deleted_at is null);
 
 create policy "content creators write content ideas"
 on public.content_ideas for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read idea scores" on public.idea_scores;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read idea scores"
 on public.idea_scores for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write idea scores" on public.idea_scores;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write idea scores"
 on public.idea_scores for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read idea sources" on public.idea_sources;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read idea sources"
 on public.idea_sources for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write idea sources" on public.idea_sources;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write idea sources"
 on public.idea_sources for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read idea events" on public.idea_events;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read idea events"
 on public.idea_events for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators create idea events" on public.idea_events;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators create idea events"
 on public.idea_events for insert
 to authenticated
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read ai providers" on public.ai_providers;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read ai providers"
 on public.ai_providers for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write ai providers" on public.ai_providers;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "workspace managers write ai providers"
 on public.ai_providers for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'workspace.manage'))
-with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "members read prompt templates" on public.prompt_templates;
-
+with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
 create policy "members read prompt templates"
 on public.prompt_templates for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write prompt templates" on public.prompt_templates;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write prompt templates"
 on public.prompt_templates for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read ai generations" on public.ai_generations;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read ai generations"
 on public.ai_generations for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write ai generations" on public.ai_generations;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write ai generations"
 on public.ai_generations for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read ai generation jobs" on public.ai_generation_jobs;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read ai generation jobs"
 on public.ai_generation_jobs for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write ai generation jobs" on public.ai_generation_jobs;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write ai generation jobs"
 on public.ai_generation_jobs for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read ai agents" on public.ai_agents;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read ai agents"
 on public.ai_agents for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write ai agents" on public.ai_agents;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write ai agents"
 on public.ai_agents for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read playground messages" on public.playground_messages;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read playground messages"
 on public.playground_messages for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write playground messages" on public.playground_messages;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write playground messages"
 on public.playground_messages for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read ai credit usage" on public.ai_credit_usage;
-
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
 create policy "members read ai credit usage"
 on public.ai_credit_usage for select
 to authenticated
-using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write ai credit usage" on public.ai_credit_usage;
-
+using (public.is_workspace_member(workspace_id));
 
 create policy "content creators write ai credit usage"
 on public.ai_credit_usage for all
 to authenticated
 using (public.has_workspace_permission(workspace_id, 'content.create'))
-with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read voice providers" on public.voice_providers;
+with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read voice providers" on public.voice_providers for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "workspace managers write voice providers" on public.voice_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
-create policy "members read voice providers" on public.voice_providers for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write voice providers" on public.voice_providers;
+create policy "members read voices" on public.voices for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "library managers write voices" on public.voices for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
-create policy "workspace managers write voice providers" on public.voice_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "members read voices" on public.voices;
+create policy "members read audio generations" on public.audio_generations for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write audio generations" on public.audio_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read image providers" on public.image_providers for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "workspace managers write image providers" on public.image_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
-create policy "members read voices" on public.voices for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write voices" on public.voices;
+create policy "members read image generations" on public.image_generations for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write image generations" on public.image_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "library managers write voices" on public.voices for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read audio generations" on public.audio_generations;
+create policy "members read media assets" on public.media_assets for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "library managers write media assets" on public.media_assets for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
+create policy "members read video projects" on public.video_projects for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video projects" on public.video_projects for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read audio generations" on public.audio_generations for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write audio generations" on public.audio_generations;
+create policy "members read video scenes" on public.video_scenes for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video scenes" on public.video_scenes for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write audio generations" on public.audio_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read image providers" on public.image_providers;
+create policy "members read subtitle segments" on public.subtitle_segments for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write subtitle segments" on public.subtitle_segments for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read music tracks" on public.music_tracks for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "library managers write music tracks" on public.music_tracks for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
-create policy "members read image providers" on public.image_providers for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write image providers" on public.image_providers;
+create policy "members read video renders" on public.video_renders for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video renders" on public.video_renders for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "workspace managers write image providers" on public.image_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "members read image generations" on public.image_generations;
+create policy "members read media usage logs" on public.media_usage_logs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write media usage logs" on public.media_usage_logs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read visual style presets" on public.visual_style_presets for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "library managers write visual style presets" on public.visual_style_presets for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
-create policy "members read image generations" on public.image_generations for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write image generations" on public.image_generations;
+create policy "members read video effects" on public.video_effects for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video effects" on public.video_effects for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write image generations" on public.image_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read media assets" on public.media_assets;
+create policy "members read video ai providers" on public.video_ai_providers for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "workspace managers write video ai providers" on public.video_ai_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
+create policy "members read image animations" on public.image_animations for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write image animations" on public.image_animations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read media assets" on public.media_assets for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write media assets" on public.media_assets;
+create policy "members read subtitle styles" on public.subtitle_styles for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "library managers write subtitle styles" on public.subtitle_styles for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));
 
-create policy "library managers write media assets" on public.media_assets for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read video projects" on public.video_projects;
+create policy "members read audio settings" on public.audio_settings for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write audio settings" on public.audio_settings for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read thumbnail generations" on public.thumbnail_generations for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write thumbnail generations" on public.thumbnail_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read video projects" on public.video_projects for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video projects" on public.video_projects;
+create policy "members read video versions" on public.video_versions for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video versions" on public.video_versions for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write video projects" on public.video_projects for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read video scenes" on public.video_scenes;
+create policy "members read magic templates" on public.magic_templates for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write magic templates" on public.magic_templates for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read magic video jobs" on public.magic_video_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write magic video jobs" on public.magic_video_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read video scenes" on public.video_scenes for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video scenes" on public.video_scenes;
+create policy "members read source videos" on public.source_videos for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write source videos" on public.source_videos for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write video scenes" on public.video_scenes for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read subtitle segments" on public.subtitle_segments;
+create policy "members read video transcripts" on public.video_transcripts for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video transcripts" on public.video_transcripts for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read viral clip jobs" on public.viral_clip_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write viral clip jobs" on public.viral_clip_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read subtitle segments" on public.subtitle_segments for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write subtitle segments" on public.subtitle_segments;
+create policy "members read viral moments" on public.viral_moments for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write viral moments" on public.viral_moments for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write subtitle segments" on public.subtitle_segments for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read music tracks" on public.music_tracks;
+create policy "members read viral clips" on public.viral_clips for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write viral clips" on public.viral_clips for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read channels" on public.channels for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write channels" on public.channels for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read music tracks" on public.music_tracks for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write music tracks" on public.music_tracks;
+create policy "members read channel templates" on public.channel_templates for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write channel templates" on public.channel_templates for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "library managers write music tracks" on public.music_tracks for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read video renders" on public.video_renders;
+create policy "members read content calendar" on public.content_calendar for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write content calendar" on public.content_calendar for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read production plans" on public.production_plans for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write production plans" on public.production_plans for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read video renders" on public.video_renders for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video renders" on public.video_renders;
+create policy "members read bulk jobs" on public.bulk_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write bulk jobs" on public.bulk_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write video renders" on public.video_renders for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read media usage logs" on public.media_usage_logs;
+create policy "members read channel goals" on public.channel_goals for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write channel goals" on public.channel_goals for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read channel permissions" on public.channel_permissions for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "workspace managers write channel permissions" on public.channel_permissions for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
-create policy "members read media usage logs" on public.media_usage_logs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write media usage logs" on public.media_usage_logs;
+create policy "members read operation notifications" on public.operation_notifications for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write operation notifications" on public.operation_notifications for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write media usage logs" on public.media_usage_logs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read visual style presets" on public.visual_style_presets;
+create policy "members read ai video providers" on public.ai_video_providers for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "workspace managers write ai video providers" on public.ai_video_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
+create policy "members read image to video jobs" on public.image_to_video_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write image to video jobs" on public.image_to_video_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read visual style presets" on public.visual_style_presets for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write visual style presets" on public.visual_style_presets;
+create policy "members read text to video jobs" on public.text_to_video_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write text to video jobs" on public.text_to_video_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "library managers write visual style presets" on public.visual_style_presets for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read video effects" on public.video_effects;
+create policy "members read intro outro generations" on public.intro_outro_generations for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write intro outro generations" on public.intro_outro_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read talking character jobs" on public.talking_character_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write talking character jobs" on public.talking_character_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read video effects" on public.video_effects for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video effects" on public.video_effects;
+create policy "members read ai video assets" on public.ai_video_assets for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write ai video assets" on public.ai_video_assets for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write video effects" on public.video_effects for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read video ai providers" on public.video_ai_providers;
+create policy "authenticated read active plans" on public.plans for select to authenticated using (status = 'active' or public.is_platform_admin());
+create policy "platform admins manage plans" on public.plans for all to authenticated using (public.is_platform_admin('finance')) with check (public.is_platform_admin('finance'));
 
+create policy "authenticated read active credit packages" on public.credit_packages for select to authenticated using (status = 'active' or public.is_platform_admin('finance'));
+create policy "platform admins manage credit packages" on public.credit_packages for all to authenticated using (public.is_platform_admin('finance')) with check (public.is_platform_admin('finance'));
 
-create policy "members read video ai providers" on public.video_ai_providers for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write video ai providers" on public.video_ai_providers;
+create policy "members read subscriptions" on public.subscriptions for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+create policy "billing managers write subscriptions" on public.subscriptions for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance'));
 
-create policy "workspace managers write video ai providers" on public.video_ai_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "members read image animations" on public.image_animations;
+create policy "members read credit wallets" on public.credit_wallets for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+create policy "billing managers write credit wallets" on public.credit_wallets for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance'));
 
+create policy "members read credit transactions" on public.credit_transactions for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+create policy "billing managers write credit transactions" on public.credit_transactions for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('finance'));
 
-create policy "members read image animations" on public.image_animations for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write image animations" on public.image_animations;
+create policy "members read billing events" on public.billing_events for select to authenticated using ((workspace_id is not null and public.is_workspace_member(workspace_id)) or public.is_platform_admin('support'));
+create policy "billing managers write billing events" on public.billing_events for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('finance')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('finance'));
 
-create policy "content creators write image animations" on public.image_animations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read subtitle styles" on public.subtitle_styles;
+create policy "members read invoices" on public.invoices for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('finance'));
+create policy "billing managers write invoices" on public.invoices for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance'));
 
+create policy "platform admins read admin registry" on public.platform_admins for select to authenticated using (user_id = auth.uid() or public.is_platform_admin('support'));
+create policy "platform owners manage admin registry" on public.platform_admins for all to authenticated using (public.is_platform_admin('owner')) with check (public.is_platform_admin('owner'));
 
-create policy "members read subtitle styles" on public.subtitle_styles for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "library managers write subtitle styles" on public.subtitle_styles;
+create policy "members read feature flags" on public.feature_flags for select to authenticated using ((workspace_id is null) or public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+create policy "billing managers write feature flags" on public.feature_flags for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('support'));
 
-create policy "library managers write subtitle styles" on public.subtitle_styles for all to authenticated using (public.has_workspace_permission(workspace_id, 'library.manage')) with check (public.has_workspace_permission(workspace_id, 'library.manage'));drop policy if exists "members read audio settings" on public.audio_settings;
+create policy "members read export packages" on public.export_packages for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "export users write export packages" on public.export_packages for all to authenticated using (public.has_workspace_permission(workspace_id, 'export_video')) with check (public.has_workspace_permission(workspace_id, 'export_video'));
 
+create policy "members read video metadata" on public.video_metadata for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "metadata editors write video metadata" on public.video_metadata for all to authenticated using (public.has_workspace_permission(workspace_id, 'edit_metadata')) with check (public.has_workspace_permission(workspace_id, 'edit_metadata'));
 
-create policy "members read audio settings" on public.audio_settings for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write audio settings" on public.audio_settings;
+create policy "members read bulk export jobs" on public.bulk_export_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "downloaders write bulk export jobs" on public.bulk_export_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'download_package')) with check (public.has_workspace_permission(workspace_id, 'download_package'));
 
-create policy "content creators write audio settings" on public.audio_settings for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read thumbnail generations" on public.thumbnail_generations;
+create policy "members read manual publications" on public.manual_publications for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "publish markers write manual publications" on public.manual_publications for all to authenticated using (public.has_workspace_permission(workspace_id, 'mark_as_published')) with check (public.has_workspace_permission(workspace_id, 'mark_as_published'));
 
+create policy "members read asset sources" on public.asset_sources for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "asset managers write asset sources" on public.asset_sources for all to authenticated using (public.has_workspace_permission(workspace_id, 'import_external_asset')) with check (public.has_workspace_permission(workspace_id, 'import_external_asset'));
 
-create policy "members read thumbnail generations" on public.thumbnail_generations for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write thumbnail generations" on public.thumbnail_generations;
+create policy "members read assets" on public.assets for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "asset uploaders write assets" on public.assets for insert to authenticated with check (public.has_workspace_permission(workspace_id, 'upload_asset') or public.has_workspace_permission(workspace_id, 'import_external_asset'));
+create policy "asset editors update assets" on public.assets for update to authenticated using (public.has_workspace_permission(workspace_id, 'edit_asset') or public.has_workspace_permission(workspace_id, 'favorite_asset')) with check (public.has_workspace_permission(workspace_id, 'edit_asset') or public.has_workspace_permission(workspace_id, 'favorite_asset'));
+create policy "asset deleters delete assets" on public.assets for delete to authenticated using (public.has_workspace_permission(workspace_id, 'delete_asset'));
 
-create policy "content creators write thumbnail generations" on public.thumbnail_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read video versions" on public.video_versions;
+create policy "members read asset collections" on public.asset_collections for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "collection creators write asset collections" on public.asset_collections for all to authenticated using (public.has_workspace_permission(workspace_id, 'create_collection')) with check (public.has_workspace_permission(workspace_id, 'create_collection'));
 
+create policy "members read asset collection items" on public.asset_collection_items for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "collection creators write asset collection items" on public.asset_collection_items for all to authenticated using (public.has_workspace_permission(workspace_id, 'create_collection')) with check (public.has_workspace_permission(workspace_id, 'create_collection'));
 
-create policy "members read video versions" on public.video_versions for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video versions" on public.video_versions;
+create policy "members read asset usage" on public.asset_usage for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write asset usage" on public.asset_usage for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "content creators write video versions" on public.video_versions for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read magic templates" on public.magic_templates;
+create policy "members read asset search cache" on public.asset_search_cache for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "importers write asset search cache" on public.asset_search_cache for all to authenticated using (public.has_workspace_permission(workspace_id, 'import_external_asset')) with check (public.has_workspace_permission(workspace_id, 'import_external_asset'));
 
+create policy "members read premium templates" on public.premium_templates for select to authenticated using (is_global or public.is_workspace_member(workspace_id));
+create policy "template creators insert premium templates" on public.premium_templates for insert to authenticated with check (workspace_id is not null and public.has_workspace_permission(workspace_id, 'create_template'));
+create policy "template editors update premium templates" on public.premium_templates for update to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'edit_template')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'edit_template')) or public.is_platform_admin('support'));
+create policy "template deleters delete premium templates" on public.premium_templates for delete to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'delete_template')) or public.is_platform_admin('support'));
 
-create policy "members read magic templates" on public.magic_templates for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write magic templates" on public.magic_templates;
+create policy "members read template packs" on public.template_packs for select to authenticated using (workspace_id is null or public.is_workspace_member(workspace_id));
+create policy "pack managers write template packs" on public.template_packs for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support'));
 
-create policy "content creators write magic templates" on public.magic_templates for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read magic video jobs" on public.magic_video_jobs;
+create policy "members read template pack items" on public.template_pack_items for select to authenticated using (workspace_id is null or public.is_workspace_member(workspace_id));
+create policy "pack managers write template pack items" on public.template_pack_items for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support'));
 
+create policy "members read onboarding progress" on public.onboarding_progress for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+create policy "users write own onboarding progress" on public.onboarding_progress for all to authenticated using (user_id = auth.uid() and public.is_workspace_member(workspace_id)) with check (user_id = auth.uid() and public.is_workspace_member(workspace_id));
 
-create policy "members read magic video jobs" on public.magic_video_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write magic video jobs" on public.magic_video_jobs;
+create policy "members read onboarding events" on public.onboarding_events for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+create policy "users write own onboarding events" on public.onboarding_events for insert to authenticated with check (user_id = auth.uid() and public.is_workspace_member(workspace_id));
 
-create policy "content creators write magic video jobs" on public.magic_video_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read source videos" on public.source_videos;
+create policy "members read video quality scores" on public.video_quality_scores for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video quality scores" on public.video_quality_scores for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read video recommendations" on public.video_recommendations for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write video recommendations" on public.video_recommendations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read source videos" on public.source_videos for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write source videos" on public.source_videos;
+create policy "authenticated read trend topics" on public.trend_topics for select to authenticated using (true);
+create policy "content creators write trend topics" on public.trend_topics for all to authenticated using (public.is_platform_admin('support')) with check (public.is_platform_admin('support'));
 
-create policy "content creators write source videos" on public.source_videos for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read video transcripts" on public.video_transcripts;
+create policy "members read idea bank" on public.idea_bank for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write idea bank" on public.idea_bank for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read tracked channels" on public.tracked_channels for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write tracked channels" on public.tracked_channels for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read video transcripts" on public.video_transcripts for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video transcripts" on public.video_transcripts;
-
-create policy "content creators write video transcripts" on public.video_transcripts for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read viral clip jobs" on public.viral_clip_jobs;
-
-
-create policy "members read viral clip jobs" on public.viral_clip_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write viral clip jobs" on public.viral_clip_jobs;
-
-create policy "content creators write viral clip jobs" on public.viral_clip_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read viral moments" on public.viral_moments;
-
-
-create policy "members read viral moments" on public.viral_moments for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write viral moments" on public.viral_moments;
-
-create policy "content creators write viral moments" on public.viral_moments for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read viral clips" on public.viral_clips;
-
-
-create policy "members read viral clips" on public.viral_clips for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write viral clips" on public.viral_clips;
-
-create policy "content creators write viral clips" on public.viral_clips for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read channels" on public.channels;
-
-
-create policy "members read channels" on public.channels for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write channels" on public.channels;
-
-create policy "content creators write channels" on public.channels for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read channel templates" on public.channel_templates;
-
-
-create policy "members read channel templates" on public.channel_templates for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write channel templates" on public.channel_templates;
-
-create policy "content creators write channel templates" on public.channel_templates for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read content calendar" on public.content_calendar;
-
-
-create policy "members read content calendar" on public.content_calendar for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write content calendar" on public.content_calendar;
-
-create policy "content creators write content calendar" on public.content_calendar for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read production plans" on public.production_plans;
-
-
-create policy "members read production plans" on public.production_plans for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write production plans" on public.production_plans;
-
-create policy "content creators write production plans" on public.production_plans for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read bulk jobs" on public.bulk_jobs;
-
-
-create policy "members read bulk jobs" on public.bulk_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write bulk jobs" on public.bulk_jobs;
-
-create policy "content creators write bulk jobs" on public.bulk_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read channel goals" on public.channel_goals;
-
-
-create policy "members read channel goals" on public.channel_goals for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write channel goals" on public.channel_goals;
-
-create policy "content creators write channel goals" on public.channel_goals for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read channel permissions" on public.channel_permissions;
-
-
-create policy "members read channel permissions" on public.channel_permissions for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write channel permissions" on public.channel_permissions;
-
-create policy "workspace managers write channel permissions" on public.channel_permissions for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "members read operation notifications" on public.operation_notifications;
-
-
-create policy "members read operation notifications" on public.operation_notifications for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write operation notifications" on public.operation_notifications;
-
-create policy "content creators write operation notifications" on public.operation_notifications for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read ai video providers" on public.ai_video_providers;
-
-
-create policy "members read ai video providers" on public.ai_video_providers for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write ai video providers" on public.ai_video_providers;
-
-create policy "workspace managers write ai video providers" on public.ai_video_providers for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "members read image to video jobs" on public.image_to_video_jobs;
-
-
-create policy "members read image to video jobs" on public.image_to_video_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write image to video jobs" on public.image_to_video_jobs;
-
-create policy "content creators write image to video jobs" on public.image_to_video_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read text to video jobs" on public.text_to_video_jobs;
-
-
-create policy "members read text to video jobs" on public.text_to_video_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write text to video jobs" on public.text_to_video_jobs;
-
-create policy "content creators write text to video jobs" on public.text_to_video_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read intro outro generations" on public.intro_outro_generations;
-
-
-create policy "members read intro outro generations" on public.intro_outro_generations for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write intro outro generations" on public.intro_outro_generations;
-
-create policy "content creators write intro outro generations" on public.intro_outro_generations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read talking character jobs" on public.talking_character_jobs;
-
-
-create policy "members read talking character jobs" on public.talking_character_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write talking character jobs" on public.talking_character_jobs;
-
-create policy "content creators write talking character jobs" on public.talking_character_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read ai video assets" on public.ai_video_assets;
-
-
-create policy "members read ai video assets" on public.ai_video_assets for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write ai video assets" on public.ai_video_assets;
-
-create policy "content creators write ai video assets" on public.ai_video_assets for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "authenticated read active plans" on public.plans;
-
-
-create policy "authenticated read active plans" on public.plans for select to authenticated using (status = 'active' or public.is_platform_admin());drop policy if exists "platform admins manage plans" on public.plans;
-
-create policy "platform admins manage plans" on public.plans for all to authenticated using (public.is_platform_admin('finance')) with check (public.is_platform_admin('finance'));drop policy if exists "authenticated read active credit packages" on public.credit_packages;
-
-
-create policy "authenticated read active credit packages" on public.credit_packages for select to authenticated using (status = 'active' or public.is_platform_admin('finance'));drop policy if exists "platform admins manage credit packages" on public.credit_packages;
-
-create policy "platform admins manage credit packages" on public.credit_packages for all to authenticated using (public.is_platform_admin('finance')) with check (public.is_platform_admin('finance'));drop policy if exists "members read subscriptions" on public.subscriptions;
-
-
-create policy "members read subscriptions" on public.subscriptions for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "billing managers write subscriptions" on public.subscriptions;
-
-create policy "billing managers write subscriptions" on public.subscriptions for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance'));drop policy if exists "members read credit wallets" on public.credit_wallets;
-
-
-create policy "members read credit wallets" on public.credit_wallets for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "billing managers write credit wallets" on public.credit_wallets;
-
-create policy "billing managers write credit wallets" on public.credit_wallets for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance'));drop policy if exists "members read credit transactions" on public.credit_transactions;
-
-
-create policy "members read credit transactions" on public.credit_transactions for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "billing managers write credit transactions" on public.credit_transactions;
-
-create policy "billing managers write credit transactions" on public.credit_transactions for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('finance'));drop policy if exists "members read billing events" on public.billing_events;
-
-
-create policy "members read billing events" on public.billing_events for select to authenticated using ((workspace_id is not null and public.is_workspace_member(workspace_id)) or public.is_platform_admin('support'));drop policy if exists "billing managers write billing events" on public.billing_events;
-
-create policy "billing managers write billing events" on public.billing_events for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('finance')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('finance'));drop policy if exists "members read invoices" on public.invoices;
-
-
-create policy "members read invoices" on public.invoices for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('finance'));drop policy if exists "billing managers write invoices" on public.invoices;
-
-create policy "billing managers write invoices" on public.invoices for all to authenticated using (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance')) with check (public.has_workspace_permission(workspace_id, 'billing.manage') or public.is_platform_admin('finance'));drop policy if exists "platform admins read admin registry" on public.platform_admins;
-
-
-create policy "platform admins read admin registry" on public.platform_admins for select to authenticated using (user_id = auth.uid() or public.is_platform_admin('support'));drop policy if exists "platform owners manage admin registry" on public.platform_admins;
-
-create policy "platform owners manage admin registry" on public.platform_admins for all to authenticated using (public.is_platform_admin('owner')) with check (public.is_platform_admin('owner'));drop policy if exists "members read feature flags" on public.feature_flags;
-
-
-create policy "members read feature flags" on public.feature_flags for select to authenticated using ((workspace_id is null) or public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "billing managers write feature flags" on public.feature_flags;
-
-create policy "billing managers write feature flags" on public.feature_flags for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'billing.manage')) or public.is_platform_admin('support'));drop policy if exists "members read export packages" on public.export_packages;
-
-
-create policy "members read export packages" on public.export_packages for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "export users write export packages" on public.export_packages;
-
-create policy "export users write export packages" on public.export_packages for all to authenticated using (public.has_workspace_permission(workspace_id, 'export_video')) with check (public.has_workspace_permission(workspace_id, 'export_video'));drop policy if exists "members read video metadata" on public.video_metadata;
-
-
-create policy "members read video metadata" on public.video_metadata for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "metadata editors write video metadata" on public.video_metadata;
-
-create policy "metadata editors write video metadata" on public.video_metadata for all to authenticated using (public.has_workspace_permission(workspace_id, 'edit_metadata')) with check (public.has_workspace_permission(workspace_id, 'edit_metadata'));drop policy if exists "members read bulk export jobs" on public.bulk_export_jobs;
-
-
-create policy "members read bulk export jobs" on public.bulk_export_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "downloaders write bulk export jobs" on public.bulk_export_jobs;
-
-create policy "downloaders write bulk export jobs" on public.bulk_export_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'download_package')) with check (public.has_workspace_permission(workspace_id, 'download_package'));drop policy if exists "members read manual publications" on public.manual_publications;
-
-
-create policy "members read manual publications" on public.manual_publications for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "publish markers write manual publications" on public.manual_publications;
-
-create policy "publish markers write manual publications" on public.manual_publications for all to authenticated using (public.has_workspace_permission(workspace_id, 'mark_as_published')) with check (public.has_workspace_permission(workspace_id, 'mark_as_published'));drop policy if exists "members read asset sources" on public.asset_sources;
-
-
-create policy "members read asset sources" on public.asset_sources for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "asset managers write asset sources" on public.asset_sources;
-
-create policy "asset managers write asset sources" on public.asset_sources for all to authenticated using (public.has_workspace_permission(workspace_id, 'import_external_asset')) with check (public.has_workspace_permission(workspace_id, 'import_external_asset'));drop policy if exists "members read assets" on public.assets;
-
-
-create policy "members read assets" on public.assets for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "asset uploaders write assets" on public.assets;
-
-create policy "asset uploaders write assets" on public.assets for insert to authenticated with check (public.has_workspace_permission(workspace_id, 'upload_asset') or public.has_workspace_permission(workspace_id, 'import_external_asset'));drop policy if exists "asset editors update assets" on public.assets;
-
-create policy "asset editors update assets" on public.assets for update to authenticated using (public.has_workspace_permission(workspace_id, 'edit_asset') or public.has_workspace_permission(workspace_id, 'favorite_asset')) with check (public.has_workspace_permission(workspace_id, 'edit_asset') or public.has_workspace_permission(workspace_id, 'favorite_asset'));drop policy if exists "asset deleters delete assets" on public.assets;
-
-create policy "asset deleters delete assets" on public.assets for delete to authenticated using (public.has_workspace_permission(workspace_id, 'delete_asset'));drop policy if exists "members read asset collections" on public.asset_collections;
-
-
-create policy "members read asset collections" on public.asset_collections for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "collection creators write asset collections" on public.asset_collections;
-
-create policy "collection creators write asset collections" on public.asset_collections for all to authenticated using (public.has_workspace_permission(workspace_id, 'create_collection')) with check (public.has_workspace_permission(workspace_id, 'create_collection'));drop policy if exists "members read asset collection items" on public.asset_collection_items;
-
-
-create policy "members read asset collection items" on public.asset_collection_items for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "collection creators write asset collection items" on public.asset_collection_items;
-
-create policy "collection creators write asset collection items" on public.asset_collection_items for all to authenticated using (public.has_workspace_permission(workspace_id, 'create_collection')) with check (public.has_workspace_permission(workspace_id, 'create_collection'));drop policy if exists "members read asset usage" on public.asset_usage;
-
-
-create policy "members read asset usage" on public.asset_usage for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write asset usage" on public.asset_usage;
-
-create policy "content creators write asset usage" on public.asset_usage for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read asset search cache" on public.asset_search_cache;
-
-
-create policy "members read asset search cache" on public.asset_search_cache for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "importers write asset search cache" on public.asset_search_cache;
-
-create policy "importers write asset search cache" on public.asset_search_cache for all to authenticated using (public.has_workspace_permission(workspace_id, 'import_external_asset')) with check (public.has_workspace_permission(workspace_id, 'import_external_asset'));drop policy if exists "members read premium templates" on public.premium_templates;
-
-
-create policy "members read premium templates" on public.premium_templates for select to authenticated using (is_global or public.is_workspace_member(workspace_id));drop policy if exists "template creators insert premium templates" on public.premium_templates;
-
-create policy "template creators insert premium templates" on public.premium_templates for insert to authenticated with check (workspace_id is not null and public.has_workspace_permission(workspace_id, 'create_template'));drop policy if exists "template editors update premium templates" on public.premium_templates;
-
-create policy "template editors update premium templates" on public.premium_templates for update to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'edit_template')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'edit_template')) or public.is_platform_admin('support'));drop policy if exists "template deleters delete premium templates" on public.premium_templates;
-
-create policy "template deleters delete premium templates" on public.premium_templates for delete to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'delete_template')) or public.is_platform_admin('support'));drop policy if exists "members read template packs" on public.template_packs;
-
-
-create policy "members read template packs" on public.template_packs for select to authenticated using (workspace_id is null or public.is_workspace_member(workspace_id));drop policy if exists "pack managers write template packs" on public.template_packs;
-
-create policy "pack managers write template packs" on public.template_packs for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support'));drop policy if exists "members read template pack items" on public.template_pack_items;
-
-
-create policy "members read template pack items" on public.template_pack_items for select to authenticated using (workspace_id is null or public.is_workspace_member(workspace_id));drop policy if exists "pack managers write template pack items" on public.template_pack_items;
-
-create policy "pack managers write template pack items" on public.template_pack_items for all to authenticated using ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support')) with check ((workspace_id is not null and public.has_workspace_permission(workspace_id, 'manage_template_packs')) or public.is_platform_admin('support'));drop policy if exists "members read onboarding progress" on public.onboarding_progress;
-
-
-create policy "members read onboarding progress" on public.onboarding_progress for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "users write own onboarding progress" on public.onboarding_progress;
-
-create policy "users write own onboarding progress" on public.onboarding_progress for all to authenticated using (user_id = auth.uid() and public.is_workspace_member(workspace_id)) with check (user_id = auth.uid() and public.is_workspace_member(workspace_id));drop policy if exists "members read onboarding events" on public.onboarding_events;
-
-
-create policy "members read onboarding events" on public.onboarding_events for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "users write own onboarding events" on public.onboarding_events;
-
-create policy "users write own onboarding events" on public.onboarding_events for insert to authenticated with check (user_id = auth.uid() and public.is_workspace_member(workspace_id));drop policy if exists "members read video quality scores" on public.video_quality_scores;
-
-
-create policy "members read video quality scores" on public.video_quality_scores for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video quality scores" on public.video_quality_scores;
-
-create policy "content creators write video quality scores" on public.video_quality_scores for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read video recommendations" on public.video_recommendations;
-
-
-create policy "members read video recommendations" on public.video_recommendations for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write video recommendations" on public.video_recommendations;
-
-create policy "content creators write video recommendations" on public.video_recommendations for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "authenticated read trend topics" on public.trend_topics;
-
-
-create policy "authenticated read trend topics" on public.trend_topics for select to authenticated using (true);drop policy if exists "content creators write trend topics" on public.trend_topics;
-
-create policy "content creators write trend topics" on public.trend_topics for all to authenticated using (public.is_platform_admin('support')) with check (public.is_platform_admin('support'));drop policy if exists "members read idea bank" on public.idea_bank;
-
-
-create policy "members read idea bank" on public.idea_bank for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write idea bank" on public.idea_bank;
-
-create policy "content creators write idea bank" on public.idea_bank for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read tracked channels" on public.tracked_channels;
-
-
-create policy "members read tracked channels" on public.tracked_channels for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write tracked channels" on public.tracked_channels;
-
-create policy "content creators write tracked channels" on public.tracked_channels for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read content factories" on public.content_factories;
-
-
-create policy "members read content factories" on public.content_factories for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "ai managers write content factories" on public.content_factories;
-
-create policy "ai managers write content factories" on public.content_factories for all to authenticated using (public.has_workspace_permission(workspace_id, 'ai.manage')) with check (public.has_workspace_permission(workspace_id, 'ai.manage'));drop policy if exists "members read production rules" on public.production_rules;
-
+create policy "members read content factories" on public.content_factories for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "ai managers write content factories" on public.content_factories for all to authenticated using (public.has_workspace_permission(workspace_id, 'ai.manage')) with check (public.has_workspace_permission(workspace_id, 'ai.manage'));
 
 create policy "members read production rules" on public.production_rules for select to authenticated using (
   exists (select 1 from public.content_factories cf where cf.id = production_rules.factory_id and public.is_workspace_member(cf.workspace_id))
-);drop policy if exists "ai managers write production rules" on public.production_rules;
-
+);
 create policy "ai managers write production rules" on public.production_rules for all to authenticated using (
   exists (select 1 from public.content_factories cf where cf.id = production_rules.factory_id and public.has_workspace_permission(cf.workspace_id, 'ai.manage'))
 ) with check (
   exists (select 1 from public.content_factories cf where cf.id = production_rules.factory_id and public.has_workspace_permission(cf.workspace_id, 'ai.manage'))
-);drop policy if exists "members read factory schedules" on public.factory_schedules;
-
+);
 
 create policy "members read factory schedules" on public.factory_schedules for select to authenticated using (
   exists (select 1 from public.content_factories cf where cf.id = factory_schedules.factory_id and public.is_workspace_member(cf.workspace_id))
-);drop policy if exists "ai managers write factory schedules" on public.factory_schedules;
-
+);
 create policy "ai managers write factory schedules" on public.factory_schedules for all to authenticated using (
   exists (select 1 from public.content_factories cf where cf.id = factory_schedules.factory_id and public.has_workspace_permission(cf.workspace_id, 'ai.manage'))
 ) with check (
   exists (select 1 from public.content_factories cf where cf.id = factory_schedules.factory_id and public.has_workspace_permission(cf.workspace_id, 'ai.manage'))
-);drop policy if exists "members read content series" on public.content_series;
+);
 
+create policy "members read content series" on public.content_series for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write content series" on public.content_series for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
-create policy "members read content series" on public.content_series for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write content series" on public.content_series;
+create policy "members read factory queue jobs" on public.factory_queue_jobs for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "ai generators write factory queue jobs" on public.factory_queue_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'ai.generate')) with check (public.has_workspace_permission(workspace_id, 'ai.generate'));
 
-create policy "content creators write content series" on public.content_series for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read factory queue jobs" on public.factory_queue_jobs;
+create policy "members read review queue items" on public.review_queue_items for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "content creators write review queue items" on public.review_queue_items for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));
 
+create policy "members read factory alerts" on public.factory_alerts for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "ai generators write factory alerts" on public.factory_alerts for all to authenticated using (public.has_workspace_permission(workspace_id, 'ai.generate')) with check (public.has_workspace_permission(workspace_id, 'ai.generate'));
 
-create policy "members read factory queue jobs" on public.factory_queue_jobs for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "ai generators write factory queue jobs" on public.factory_queue_jobs;
+create policy "members read backup jobs" on public.backup_jobs for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+create policy "workspace managers write backup jobs" on public.backup_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support'));
 
-create policy "ai generators write factory queue jobs" on public.factory_queue_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'ai.generate')) with check (public.has_workspace_permission(workspace_id, 'ai.generate'));drop policy if exists "members read review queue items" on public.review_queue_items;
+create policy "members read data retention policies" on public.data_retention_policies for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "workspace managers write data retention policies" on public.data_retention_policies for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
+create policy "security readers read security events" on public.security_events for select to authenticated using (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));
+create policy "platform writes security events" on public.security_events for insert to authenticated with check (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
 
-create policy "members read review queue items" on public.review_queue_items for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "content creators write review queue items" on public.review_queue_items;
+create policy "members read rate limits" on public.rate_limits for select to authenticated using (public.is_workspace_member(workspace_id));
+create policy "workspace managers write rate limits" on public.rate_limits for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));
 
-create policy "content creators write review queue items" on public.review_queue_items for all to authenticated using (public.has_workspace_permission(workspace_id, 'content.create')) with check (public.has_workspace_permission(workspace_id, 'content.create'));drop policy if exists "members read factory alerts" on public.factory_alerts;
+create policy "security readers read error logs" on public.error_logs for select to authenticated using (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));
+create policy "members insert error logs" on public.error_logs for insert to authenticated with check (public.is_workspace_member(workspace_id));
+create policy "security readers update error logs" on public.error_logs for update to authenticated using (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support')) with check (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));
 
+create policy "users read own legal acceptances" on public.user_legal_acceptances for select to authenticated using (user_id = auth.uid());
+create policy "users insert own legal acceptances" on public.user_legal_acceptances for insert to authenticated with check (user_id = auth.uid());
 
-create policy "members read factory alerts" on public.factory_alerts for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "ai generators write factory alerts" on public.factory_alerts;
+create policy "members read data requests" on public.data_requests for select to authenticated using (public.is_workspace_member(workspace_id) or user_id = auth.uid());
+create policy "members create data requests" on public.data_requests for insert to authenticated with check (public.is_workspace_member(workspace_id) and (user_id is null or user_id = auth.uid()));
+create policy "workspace managers update data requests" on public.data_requests for update to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support'));
 
-create policy "ai generators write factory alerts" on public.factory_alerts for all to authenticated using (public.has_workspace_permission(workspace_id, 'ai.generate')) with check (public.has_workspace_permission(workspace_id, 'ai.generate'));drop policy if exists "members read backup jobs" on public.backup_jobs;
-
-
-create policy "members read backup jobs" on public.backup_jobs for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "workspace managers write backup jobs" on public.backup_jobs;
-
-create policy "workspace managers write backup jobs" on public.backup_jobs for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support'));drop policy if exists "members read data retention policies" on public.data_retention_policies;
-
-
-create policy "members read data retention policies" on public.data_retention_policies for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write data retention policies" on public.data_retention_policies;
-
-create policy "workspace managers write data retention policies" on public.data_retention_policies for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "security readers read security events" on public.security_events;
-
-
-create policy "security readers read security events" on public.security_events for select to authenticated using (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));drop policy if exists "platform writes security events" on public.security_events;
-
-create policy "platform writes security events" on public.security_events for insert to authenticated with check (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "members read rate limits" on public.rate_limits;
-
-
-create policy "members read rate limits" on public.rate_limits for select to authenticated using (public.is_workspace_member(workspace_id));drop policy if exists "workspace managers write rate limits" on public.rate_limits;
-
-create policy "workspace managers write rate limits" on public.rate_limits for all to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage'));drop policy if exists "security readers read error logs" on public.error_logs;
-
-
-create policy "security readers read error logs" on public.error_logs for select to authenticated using (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));drop policy if exists "members insert error logs" on public.error_logs;
-
-create policy "members insert error logs" on public.error_logs for insert to authenticated with check (public.is_workspace_member(workspace_id));drop policy if exists "security readers update error logs" on public.error_logs;
-
-create policy "security readers update error logs" on public.error_logs for update to authenticated using (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support')) with check (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));drop policy if exists "users read own legal acceptances" on public.user_legal_acceptances;
-
-
-create policy "users read own legal acceptances" on public.user_legal_acceptances for select to authenticated using (user_id = auth.uid());drop policy if exists "users insert own legal acceptances" on public.user_legal_acceptances;
-
-create policy "users insert own legal acceptances" on public.user_legal_acceptances for insert to authenticated with check (user_id = auth.uid());drop policy if exists "members read data requests" on public.data_requests;
-
-
-create policy "members read data requests" on public.data_requests for select to authenticated using (public.is_workspace_member(workspace_id) or user_id = auth.uid());drop policy if exists "members create data requests" on public.data_requests;
-
-create policy "members create data requests" on public.data_requests for insert to authenticated with check (public.is_workspace_member(workspace_id) and (user_id is null or user_id = auth.uid()));drop policy if exists "workspace managers update data requests" on public.data_requests;
-
-create policy "workspace managers update data requests" on public.data_requests for update to authenticated using (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support')) with check (public.has_workspace_permission(workspace_id, 'workspace.manage') or public.is_platform_admin('support'));drop policy if exists "members read smoke test video results" on public.smoke_test_video_results;
-
-
-create policy "members read smoke test video results" on public.smoke_test_video_results for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));drop policy if exists "audit writers write smoke test video results" on public.smoke_test_video_results;
-
+create policy "members read smoke test video results" on public.smoke_test_video_results for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
 create policy "audit writers write smoke test video results" on public.smoke_test_video_results for all to authenticated using (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support')) with check (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));
 
 insert into public.permissions (key, description) values
@@ -3270,699 +3036,923 @@ on conflict do nothing;
 insert into public.niches (name, is_default, active) values
   ('Marketing', true, true),
   ('Vendas', true, true),
-  ('FinanÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§as', true, true),
+  ('FinanÃƒÂ§as', true, true),
   ('Investimentos', true, true),
-  ('SaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºde', true, true),
+  ('SaÃƒÂºde', true, true),
   ('Emagrecimento', true, true),
   ('Fitness', true, true),
   ('Desenvolvimento Pessoal', true, true),
   ('Relacionamentos', true, true),
-  ('EducaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o', true, true),
+  ('EducaÃƒÂ§ÃƒÂ£o', true, true),
   ('Tecnologia', true, true),
-  ('InteligÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âªncia Artificial', true, true),
+  ('InteligÃƒÂªncia Artificial', true, true),
   ('E-commerce', true, true),
-  ('ImÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³veis', true, true),
+  ('ImÃƒÂ³veis', true, true),
   ('Seguros', true, true),
-  ('ProteÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o Veicular', true, true),
-  ('JurÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­dico', true, true),
+  ('ProteÃƒÂ§ÃƒÂ£o Veicular', true, true),
+  ('JurÃƒÂ­dico', true, true),
   ('Turismo', true, true)
 on conflict (workspace_id, name) do nothing;
 
-do $$
-begin
-  alter publication supabase_realtime add table public.workspaces;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.workspace_users;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.roles;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.permissions;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.audit_logs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.projects;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.niches;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.personas;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.keywords;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.tags;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.content_folders;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.content_items;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.content_item_tags;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.favorites;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.trends;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.competitors;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.competitor_insights;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.content_ideas;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.idea_scores;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.idea_sources;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.idea_events;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.ai_providers;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.prompt_templates;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.ai_generations;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.ai_generation_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.ai_agents;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.playground_messages;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.ai_credit_usage;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.voice_providers;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.voices;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.audio_generations;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.image_providers;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.image_generations;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.media_assets;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_projects;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_scenes;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.subtitle_segments;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.music_tracks;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_renders;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.media_usage_logs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.visual_style_presets;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_effects;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_ai_providers;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.image_animations;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.subtitle_styles;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.audio_settings;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.thumbnail_generations;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_versions;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.magic_templates;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.magic_video_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.source_videos;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_transcripts;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.viral_clip_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.viral_moments;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.viral_clips;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.channels;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.channel_templates;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.content_calendar;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.production_plans;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.bulk_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.channel_goals;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.channel_permissions;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.operation_notifications;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.ai_video_providers;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.image_to_video_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.text_to_video_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.intro_outro_generations;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.talking_character_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.ai_video_assets;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.plans;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.subscriptions;
-exception
-  when duplicate_object then null;
-end $$;
+alter publication supabase_realtime add table public.workspaces;
+alter publication supabase_realtime add table public.workspace_users;
+alter publication supabase_realtime add table public.roles;
+alter publication supabase_realtime add table public.permissions;
+alter publication supabase_realtime add table public.audit_logs;
+alter publication supabase_realtime add table public.projects;
+alter publication supabase_realtime add table public.niches;
+alter publication supabase_realtime add table public.personas;
+alter publication supabase_realtime add table public.keywords;
+alter publication supabase_realtime add table public.tags;
+alter publication supabase_realtime add table public.content_folders;
+alter publication supabase_realtime add table public.content_items;
+alter publication supabase_realtime add table public.content_item_tags;
+alter publication supabase_realtime add table public.favorites;
+alter publication supabase_realtime add table public.trends;
+alter publication supabase_realtime add table public.competitors;
+alter publication supabase_realtime add table public.competitor_insights;
+alter publication supabase_realtime add table public.content_ideas;
+alter publication supabase_realtime add table public.idea_scores;
+alter publication supabase_realtime add table public.idea_sources;
+alter publication supabase_realtime add table public.idea_events;
+alter publication supabase_realtime add table public.ai_providers;
+alter publication supabase_realtime add table public.prompt_templates;
+alter publication supabase_realtime add table public.ai_generations;
+alter publication supabase_realtime add table public.ai_generation_jobs;
+alter publication supabase_realtime add table public.ai_agents;
+alter publication supabase_realtime add table public.playground_messages;
+alter publication supabase_realtime add table public.ai_credit_usage;
+alter publication supabase_realtime add table public.voice_providers;
+alter publication supabase_realtime add table public.voices;
+alter publication supabase_realtime add table public.audio_generations;
+alter publication supabase_realtime add table public.image_providers;
+alter publication supabase_realtime add table public.image_generations;
+alter publication supabase_realtime add table public.media_assets;
+alter publication supabase_realtime add table public.video_projects;
+alter publication supabase_realtime add table public.video_scenes;
+alter publication supabase_realtime add table public.subtitle_segments;
+alter publication supabase_realtime add table public.music_tracks;
+alter publication supabase_realtime add table public.video_renders;
+alter publication supabase_realtime add table public.media_usage_logs;
+alter publication supabase_realtime add table public.visual_style_presets;
+alter publication supabase_realtime add table public.video_effects;
+alter publication supabase_realtime add table public.video_ai_providers;
+alter publication supabase_realtime add table public.image_animations;
+alter publication supabase_realtime add table public.subtitle_styles;
+alter publication supabase_realtime add table public.audio_settings;
+alter publication supabase_realtime add table public.thumbnail_generations;
+alter publication supabase_realtime add table public.video_versions;
+alter publication supabase_realtime add table public.magic_templates;
+alter publication supabase_realtime add table public.magic_video_jobs;
+alter publication supabase_realtime add table public.source_videos;
+alter publication supabase_realtime add table public.video_transcripts;
+alter publication supabase_realtime add table public.viral_clip_jobs;
+alter publication supabase_realtime add table public.viral_moments;
+alter publication supabase_realtime add table public.viral_clips;
+alter publication supabase_realtime add table public.channels;
+alter publication supabase_realtime add table public.channel_templates;
+alter publication supabase_realtime add table public.content_calendar;
+alter publication supabase_realtime add table public.production_plans;
+alter publication supabase_realtime add table public.bulk_jobs;
+alter publication supabase_realtime add table public.channel_goals;
+alter publication supabase_realtime add table public.channel_permissions;
+alter publication supabase_realtime add table public.operation_notifications;
+alter publication supabase_realtime add table public.ai_video_providers;
+alter publication supabase_realtime add table public.image_to_video_jobs;
+alter publication supabase_realtime add table public.text_to_video_jobs;
+alter publication supabase_realtime add table public.intro_outro_generations;
+alter publication supabase_realtime add table public.talking_character_jobs;
+alter publication supabase_realtime add table public.ai_video_assets;
+alter publication supabase_realtime add table public.plans;
+alter publication supabase_realtime add table public.subscriptions;
+alter publication supabase_realtime add table public.credit_wallets;
+alter publication supabase_realtime add table public.credit_transactions;
+alter publication supabase_realtime add table public.credit_packages;
+alter publication supabase_realtime add table public.billing_events;
+alter publication supabase_realtime add table public.invoices;
+alter publication supabase_realtime add table public.platform_admins;
+alter publication supabase_realtime add table public.feature_flags;
+alter publication supabase_realtime add table public.export_packages;
+alter publication supabase_realtime add table public.video_metadata;
+alter publication supabase_realtime add table public.bulk_export_jobs;
+alter publication supabase_realtime add table public.manual_publications;
+alter publication supabase_realtime add table public.asset_sources;
+alter publication supabase_realtime add table public.assets;
+alter publication supabase_realtime add table public.asset_collections;
+alter publication supabase_realtime add table public.asset_collection_items;
+alter publication supabase_realtime add table public.asset_usage;
+alter publication supabase_realtime add table public.asset_search_cache;
+alter publication supabase_realtime add table public.premium_templates;
+alter publication supabase_realtime add table public.template_packs;
+alter publication supabase_realtime add table public.template_pack_items;
+alter publication supabase_realtime add table public.onboarding_progress;
+alter publication supabase_realtime add table public.onboarding_events;
+alter publication supabase_realtime add table public.video_quality_scores;
+alter publication supabase_realtime add table public.video_recommendations;
+alter publication supabase_realtime add table public.trend_topics;
+alter publication supabase_realtime add table public.idea_bank;
+alter publication supabase_realtime add table public.tracked_channels;
+alter publication supabase_realtime add table public.content_factories;
+alter publication supabase_realtime add table public.production_rules;
+alter publication supabase_realtime add table public.factory_schedules;
+alter publication supabase_realtime add table public.content_series;
+alter publication supabase_realtime add table public.factory_queue_jobs;
+alter publication supabase_realtime add table public.review_queue_items;
+alter publication supabase_realtime add table public.factory_alerts;
+alter publication supabase_realtime add table public.backup_jobs;
+alter publication supabase_realtime add table public.data_retention_policies;
+alter publication supabase_realtime add table public.security_events;
+alter publication supabase_realtime add table public.rate_limits;
+alter publication supabase_realtime add table public.error_logs;
+alter publication supabase_realtime add table public.user_legal_acceptances;
+alter publication supabase_realtime add table public.data_requests;
+alter publication supabase_realtime add table public.smoke_test_video_results;
+
+-- ============================================================
+-- Source: supabase\migrations\20260610_r5_production_infra.sql
+-- ============================================================
+create table if not exists public.background_jobs (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
+  type text not null check (type in ('magic_video','ai_generation','tts_generation','image_generation','render_video','export_package','viral_clip','text_to_video','image_to_video','talking_character','backup','factory_generation')),
+  status text not null default 'queued' check (status in ('queued','running','completed','failed','cancelled','retrying')),
+  priority integer not null default 5,
+  payload jsonb not null default '{}'::jsonb,
+  result jsonb,
+  progress integer not null default 0 check (progress between 0 and 100),
+  current_step text not null default 'Na fila',
+  attempts integer not null default 0,
+  max_attempts integer not null default 3,
+  error_message text,
+  scheduled_at timestamptz not null default now(),
+  started_at timestamptz,
+  completed_at timestamptz,
+  cancelled_at timestamptz,
+  cancel_requested boolean not null default false,
+  locked_at timestamptz,
+  locked_by text,
+  lock_expired_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.background_job_logs (
+  id uuid primary key default gen_random_uuid(),
+  job_id uuid not null references public.background_jobs(id) on delete cascade,
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  level text not null check (level in ('info','warning','error','debug')),
+  message text not null,
+  metadata jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.worker_heartbeats (
+  id uuid primary key default gen_random_uuid(),
+  worker_id text not null unique,
+  status text not null check (status in ('active','idle','stopped')),
+  last_seen_at timestamptz not null default now(),
+  metadata jsonb
+);
+
+create table if not exists public.provider_usage_logs (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
+  job_id uuid references public.background_jobs(id) on delete set null,
+  provider text not null,
+  model text,
+  task_type text not null,
+  input_units numeric(12,2) not null default 0,
+  output_units numeric(12,2) not null default 0,
+  cost_estimate numeric(12,6) not null default 0,
+  credits_charged numeric(12,2) not null default 0,
+  status text not null check (status in ('completed','failed','blocked')),
+  error_message text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+alter table public.credit_wallets add column if not exists reserved_balance numeric(12,2) not null default 0;
+
+alter table public.credit_transactions drop constraint if exists credit_transactions_type_check;
+alter table public.credit_transactions add constraint credit_transactions_type_check
+  check (type in ('monthly_grant','purchase','usage','refund','adjustment','expiration','reserve','release'));
+
+alter table public.media_usage_logs drop constraint if exists media_usage_logs_action_type_check;
+alter table public.media_usage_logs add constraint media_usage_logs_action_type_check
+  check (action_type in ('tts_generation','image_generation','video_render','render_video','ai_generation','ai_animation','upload','export_package','magic_video','viral_clip','factory_generation'));
+
+alter table public.export_packages drop constraint if exists export_packages_status_check;
+alter table public.export_packages add constraint export_packages_status_check
+  check (status in ('draft','preparing','generating_metadata','creating_zip','uploading','ready','downloaded','marked_as_published','failed'));
+
+create index if not exists idx_background_jobs_queue on public.background_jobs(status, scheduled_at, priority desc);
+create index if not exists idx_background_jobs_workspace on public.background_jobs(workspace_id, created_at desc);
+create index if not exists idx_background_jobs_type_status on public.background_jobs(type, status);
+create index if not exists idx_background_jobs_lock on public.background_jobs(status, locked_at, lock_expired_at);
+create index if not exists idx_background_job_logs_job on public.background_job_logs(job_id, created_at);
+create index if not exists idx_background_job_logs_workspace on public.background_job_logs(workspace_id, created_at desc);
+create index if not exists idx_worker_heartbeats_seen on public.worker_heartbeats(last_seen_at desc);
+create index if not exists idx_provider_usage_workspace on public.provider_usage_logs(workspace_id, created_at desc);
+create index if not exists idx_provider_usage_provider on public.provider_usage_logs(provider, task_type, status);
+
+alter table public.background_jobs enable row level security;
+alter table public.background_job_logs enable row level security;
+alter table public.worker_heartbeats enable row level security;
+alter table public.provider_usage_logs enable row level security;
+
+drop policy if exists "members read background jobs" on public.background_jobs;
+create policy "members read background jobs" on public.background_jobs
+  for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+
+drop policy if exists "creators create background jobs" on public.background_jobs;
+create policy "creators create background jobs" on public.background_jobs
+  for insert to authenticated with check (public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('support'));
+
+drop policy if exists "creators update own workspace jobs" on public.background_jobs;
+create policy "creators update own workspace jobs" on public.background_jobs
+  for update to authenticated using (public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('support'))
+  with check (public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('support'));
+
+drop policy if exists "members read background job logs" on public.background_job_logs;
+create policy "members read background job logs" on public.background_job_logs
+  for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+
+drop policy if exists "creators write background job logs" on public.background_job_logs;
+create policy "creators write background job logs" on public.background_job_logs
+  for insert to authenticated with check (public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('support'));
+
+drop policy if exists "platform admins read worker heartbeats" on public.worker_heartbeats;
+create policy "platform admins read worker heartbeats" on public.worker_heartbeats
+  for select to authenticated using (public.is_platform_admin('support') or public.is_platform_admin('admin'));
+
+drop policy if exists "members read provider usage logs" on public.provider_usage_logs;
+create policy "members read provider usage logs" on public.provider_usage_logs
+  for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+
+drop policy if exists "service writers provider usage logs" on public.provider_usage_logs;
+create policy "service writers provider usage logs" on public.provider_usage_logs
+  for insert to authenticated with check (public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('support'));
+
+create or replace function public.claim_background_job(worker_id_input text, lock_minutes_input integer default 15)
+returns setof public.background_jobs
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  claimed_id uuid;
+begin
+  select id into claimed_id
+  from public.background_jobs
+  where status in ('queued','retrying')
+    and scheduled_at <= now()
+  order by priority desc, created_at asc
+  for update skip locked
+  limit 1;
+
+  if claimed_id is null then
+    return;
+  end if;
+
+  update public.background_jobs
+  set status = 'running',
+      attempts = attempts + 1,
+      started_at = coalesce(started_at, now()),
+      locked_at = now(),
+      locked_by = worker_id_input,
+      lock_expired_at = now() + make_interval(mins => lock_minutes_input),
+      current_step = 'Processando tentativa ' || (attempts + 1)::text,
+      updated_at = now()
+  where id = claimed_id;
+
+  insert into public.background_job_logs(job_id, workspace_id, level, message, metadata)
+  select id, workspace_id, 'info', 'Job travado pelo worker', jsonb_build_object('workerId', worker_id_input)
+  from public.background_jobs
+  where id = claimed_id;
+
+  return query select * from public.background_jobs where id = claimed_id;
+end;
+$$;
+
+create or replace function public.reserve_credits_for_job(
+  workspace_id_input uuid,
+  user_id_input uuid,
+  job_id_input uuid,
+  job_type_input text,
+  amount_input numeric
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  wallet public.credit_wallets%rowtype;
+begin
+  if amount_input <= 0 then
+    return jsonb_build_object('reserved', false);
+  end if;
+
+  select * into wallet
+  from public.credit_wallets
+  where workspace_id = workspace_id_input
+  for update;
+
+  if not found then
+    raise exception 'Carteira de creditos nao encontrada.';
+  end if;
+
+  if wallet.balance - wallet.reserved_balance < amount_input then
+    raise exception 'Creditos insuficientes para reservar.';
+  end if;
+
+  update public.credit_wallets
+  set reserved_balance = reserved_balance + amount_input,
+      updated_at = now()
+  where workspace_id = workspace_id_input
+  returning * into wallet;
+
+  insert into public.credit_transactions(workspace_id, user_id, type, amount, balance_after, description, reference_type, reference_id)
+  values (workspace_id_input, user_id_input, 'reserve', amount_input, wallet.balance - wallet.reserved_balance, 'Reserva para job ' || job_type_input, 'background_job', job_id_input);
+
+  return jsonb_build_object('reserved', true, 'balance_after', wallet.balance - wallet.reserved_balance);
+end;
+$$;
+
+create or replace function public.settle_reserved_credits_for_job(
+  workspace_id_input uuid,
+  user_id_input uuid,
+  job_id_input uuid,
+  job_type_input text,
+  amount_input numeric,
+  consumed_input boolean
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  wallet public.credit_wallets%rowtype;
+  transaction_type text;
+  transaction_amount numeric;
+  description_text text;
+begin
+  if amount_input <= 0 then
+    return jsonb_build_object('settled', false);
+  end if;
+
+  select * into wallet
+  from public.credit_wallets
+  where workspace_id = workspace_id_input
+  for update;
+
+  if not found then
+    raise exception 'Carteira de creditos nao encontrada.';
+  end if;
+
+  if consumed_input then
+    update public.credit_wallets
+    set balance = greatest(0, balance - amount_input),
+        reserved_balance = greatest(0, reserved_balance - amount_input),
+        used_this_period = used_this_period + amount_input,
+        updated_at = now()
+    where workspace_id = workspace_id_input
+    returning * into wallet;
+    transaction_type := 'usage';
+    transaction_amount := -amount_input;
+    description_text := 'Debito de creditos do job ' || job_type_input;
+  else
+    update public.credit_wallets
+    set reserved_balance = greatest(0, reserved_balance - amount_input),
+        updated_at = now()
+    where workspace_id = workspace_id_input
+    returning * into wallet;
+    transaction_type := 'release';
+    transaction_amount := amount_input;
+    description_text := 'Estorno de reserva do job ' || job_type_input;
+  end if;
+
+  insert into public.credit_transactions(workspace_id, user_id, type, amount, balance_after, description, reference_type, reference_id)
+  values (workspace_id_input, user_id_input, transaction_type, transaction_amount, wallet.balance - wallet.reserved_balance, description_text, 'background_job', job_id_input);
+
+  return jsonb_build_object('settled', true, 'consumed', consumed_input, 'balance_after', wallet.balance - wallet.reserved_balance);
+end;
+$$;
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values
+  ('videos', 'videos', false, 524288000, array['video/mp4','video/webm','video/quicktime']),
+  ('thumbnails', 'thumbnails', false, 20971520, array['image/png','image/jpeg','image/webp']),
+  ('exports', 'exports', false, 1073741824, array['application/zip','application/octet-stream']),
+  ('audio', 'audio', false, 104857600, array['audio/mpeg','audio/wav','audio/ogg','audio/mp4']),
+  ('images', 'images', false, 52428800, array['image/png','image/jpeg','image/webp']),
+  ('temp', 'temp', false, 1073741824, null)
+on conflict (id) do update set public = excluded.public;
+
+drop policy if exists "members read own workspace media objects" on storage.objects;
+create policy "members read own workspace media objects" on storage.objects
+  for select to authenticated
+  using (
+    bucket_id in ('videos','thumbnails','exports','audio','images','temp')
+    and (storage.foldername(name))[1] ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+    and public.is_workspace_member((storage.foldername(name))[1]::uuid)
+  );
+
+do $$
+begin
+  alter publication supabase_realtime add table public.background_jobs;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.background_job_logs;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.worker_heartbeats;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.provider_usage_logs;
+exception
+  when duplicate_object then null;
+end $$;
+
+-- ============================================================
+-- Source: supabase\migrations\20260610_r6_real_ai_providers.sql
+-- ============================================================
+create table if not exists public.provider_usage_logs (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
+  job_id uuid references public.background_jobs(id) on delete set null,
+  provider text not null,
+  model text,
+  task_type text not null,
+  input_units numeric(12,2) not null default 0,
+  output_units numeric(12,2) not null default 0,
+  cost_estimate numeric(12,6) not null default 0,
+  credits_charged numeric(12,2) not null default 0,
+  status text not null check (status in ('completed','failed','blocked')),
+  error_message text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_provider_usage_workspace on public.provider_usage_logs(workspace_id, created_at desc);
+create index if not exists idx_provider_usage_provider on public.provider_usage_logs(provider, task_type, status);
+
+alter table public.provider_usage_logs enable row level security;
+
+drop policy if exists "members read provider usage logs" on public.provider_usage_logs;
+create policy "members read provider usage logs" on public.provider_usage_logs
+  for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+
+drop policy if exists "content creators write provider usage logs" on public.provider_usage_logs;
+create policy "content creators write provider usage logs" on public.provider_usage_logs
+  for insert to authenticated with check (public.has_workspace_permission(workspace_id, 'content.create') or public.is_platform_admin('support'));
+
+alter table public.media_usage_logs drop constraint if exists media_usage_logs_action_type_check;
+alter table public.media_usage_logs add constraint media_usage_logs_action_type_check
+  check (action_type in ('tts_generation','image_generation','video_render','render_video','ai_generation','ai_animation','upload','export_package','magic_video','viral_clip','factory_generation','thumbnail_generation','video_ai_generation'));
+
+do $$
+begin
+  alter publication supabase_realtime add table public.provider_usage_logs;
+exception
+  when duplicate_object then null;
+end $$;
+
+-- ============================================================
+-- Source: supabase\migrations\20260610_r6_5_security_hardening.sql
+-- ============================================================
+create table if not exists public.rate_limit_events (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
+  feature text not null,
+  route text not null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_rate_limit_events_workspace on public.rate_limit_events(workspace_id, feature, created_at desc);
+create index if not exists idx_rate_limit_events_user on public.rate_limit_events(user_id, created_at desc);
+
+alter table public.rate_limit_events enable row level security;
+
+drop policy if exists "members read rate limit events" on public.rate_limit_events;
+create policy "members read rate limit events" on public.rate_limit_events
+  for select to authenticated using (public.is_workspace_member(workspace_id) or public.is_platform_admin('support'));
+
+drop policy if exists "service writers rate limit events" on public.rate_limit_events;
+create policy "service writers rate limit events" on public.rate_limit_events
+  for insert to authenticated with check (public.has_workspace_permission(workspace_id, 'audit.read') or public.is_platform_admin('support'));
+
+do $$
+begin
+  alter publication supabase_realtime add table public.rate_limit_events;
+exception
+  when duplicate_object then null;
+end $$;
+
+-- ============================================================
+-- Source: supabase\migrations\20260610_r6_6_supabase_clean_billing.sql
+-- ============================================================
+alter table public.credit_wallets add column if not exists reserved_balance numeric(12,2) not null default 0;
+alter table public.workspaces add column if not exists status text not null default 'active';
+
+alter table public.workspaces drop constraint if exists workspaces_status_check;
+alter table public.workspaces add constraint workspaces_status_check
+  check (status in ('active','suspended','archived'));
+
+alter table public.credit_wallets drop constraint if exists credit_wallets_non_negative_check;
+alter table public.credit_wallets add constraint credit_wallets_non_negative_check
+  check (balance >= 0 and reserved_balance >= 0 and reserved_balance <= balance);
+
+alter table public.credit_transactions drop constraint if exists credit_transactions_type_check;
+alter table public.credit_transactions add constraint credit_transactions_type_check
+  check (type in ('monthly_grant','purchase','usage','refund','adjustment','expiration','reserve','release'));
+
+create or replace function public.create_credit_wallet_for_workspace()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  default_plan public.plans%rowtype;
+  initial_credits numeric(12,2);
+begin
+  select * into default_plan
+  from public.plans
+  where slug = 'basic' and status = 'active'
+  limit 1;
+
+  initial_credits := coalesce(default_plan.included_credits, 0);
+
+  insert into public.credit_wallets(workspace_id, balance, monthly_allowance, purchased_credits, used_this_period, reset_at)
+  values (new.id, initial_credits, initial_credits, 0, 0, now() + interval '30 days')
+  on conflict (workspace_id) do nothing;
+
+  if default_plan.id is not null then
+    insert into public.subscriptions(workspace_id, plan_id, status, billing_cycle, provider)
+    values (new.id, default_plan.id, 'trialing', 'monthly', 'placeholder')
+    on conflict do nothing;
+  end if;
+
+  if initial_credits > 0 then
+    insert into public.credit_transactions(workspace_id, type, amount, balance_after, description)
+    values (new.id, 'monthly_grant', initial_credits, initial_credits, 'Saldo inicial automatico do workspace')
+    on conflict do nothing;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists create_credit_wallet_after_workspace_insert on public.workspaces;
+create trigger create_credit_wallet_after_workspace_insert
+after insert on public.workspaces
+for each row execute function public.create_credit_wallet_for_workspace();
+
+drop policy if exists "members read own workspace media objects" on storage.objects;
+create policy "members read own workspace media objects" on storage.objects
+  for select to authenticated
+  using (
+    bucket_id in ('videos','thumbnails','exports','audio','images','temp')
+    and array_length(storage.foldername(name), 1) >= 1
+    and (storage.foldername(name))[1] ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+    and public.is_workspace_member((storage.foldername(name))[1]::uuid)
+  );
+
+drop policy if exists "members upload own workspace media objects" on storage.objects;
+create policy "members upload own workspace media objects" on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id in ('videos','thumbnails','exports','audio','images','temp')
+    and array_length(storage.foldername(name), 1) >= 1
+    and (storage.foldername(name))[1] ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+    and public.has_workspace_permission((storage.foldername(name))[1]::uuid, 'content.create')
+  );
+
 do $$
 begin
   alter publication supabase_realtime add table public.credit_wallets;
 exception
   when duplicate_object then null;
 end $$;
+
 do $$
 begin
   alter publication supabase_realtime add table public.credit_transactions;
 exception
   when duplicate_object then null;
 end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.credit_packages;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.billing_events;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.invoices;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.platform_admins;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.feature_flags;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.export_packages;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_metadata;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.bulk_export_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.manual_publications;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.asset_sources;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.assets;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.asset_collections;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.asset_collection_items;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.asset_usage;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.asset_search_cache;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.premium_templates;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.template_packs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.template_pack_items;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.onboarding_progress;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.onboarding_events;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_quality_scores;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.video_recommendations;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.trend_topics;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.idea_bank;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.tracked_channels;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.content_factories;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.production_rules;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.factory_schedules;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.content_series;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.factory_queue_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.review_queue_items;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.factory_alerts;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.backup_jobs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.data_retention_policies;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.security_events;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.rate_limits;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.error_logs;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.user_legal_acceptances;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.data_requests;
-exception
-  when duplicate_object then null;
-end $$;
-do $$
-begin
-  alter publication supabase_realtime add table public.smoke_test_video_results;
-exception
-  when duplicate_object then null;
-end $$;
+
+-- ============================================================
+-- Source: supabase\migrations\20260610_r11_platform_ecosystem.sql
+-- ============================================================
+create table if not exists public.public_api_keys (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  name text not null,
+  key_prefix text not null,
+  key_hash text not null unique,
+  scopes text[] not null default '{}',
+  status text not null default 'active' check (status in ('active', 'revoked', 'expired')),
+  rate_limit_per_minute integer not null default 60,
+  last_used_at timestamptz,
+  expires_at timestamptz,
+  created_by uuid references auth.users(id) on delete set null,
+  revoked_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.webhook_endpoints (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  url text not null,
+  secret_encrypted text not null,
+  events text[] not null default '{}',
+  status text not null default 'active' check (status in ('active', 'paused', 'disabled')),
+  failure_count integer not null default 0,
+  last_delivery_at timestamptz,
+  created_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.webhook_deliveries (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  endpoint_id uuid references public.webhook_endpoints(id) on delete set null,
+  event_type text not null,
+  payload jsonb not null default '{}'::jsonb,
+  status text not null default 'pending' check (status in ('pending', 'delivered', 'failed')),
+  http_status integer,
+  error_message text,
+  attempts integer not null default 0,
+  delivered_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.marketplace_listings (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid references public.workspaces(id) on delete set null,
+  creator_user_id uuid references auth.users(id) on delete set null,
+  type text not null check (type in ('template', 'agent', 'workflow')),
+  name text not null,
+  description text,
+  category text,
+  niche text,
+  pricing_type text not null default 'free' check (pricing_type in ('free', 'premium', 'community')),
+  price numeric(10,2) not null default 0,
+  status text not null default 'draft' check (status in ('draft', 'review', 'published', 'rejected', 'archived')),
+  is_featured boolean not null default false,
+  usage_count integer not null default 0,
+  revenue numeric(12,2) not null default 0,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.platform_usage_events (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid references public.workspaces(id) on delete cascade,
+  api_key_id uuid references public.public_api_keys(id) on delete set null,
+  event_type text not null,
+  resource_type text,
+  resource_id text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.workspace_organizations (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  owner_workspace_id uuid references public.workspaces(id) on delete cascade,
+  billing_workspace_id uuid references public.workspaces(id) on delete set null,
+  white_label_domain text,
+  status text not null default 'active' check (status in ('active', 'suspended', 'archived')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.workspace_organization_members (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.workspace_organizations(id) on delete cascade,
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  relationship text not null default 'child' check (relationship in ('owner', 'child', 'franchise', 'client')),
+  created_at timestamptz not null default now(),
+  unique (organization_id, workspace_id)
+);
+
+create table if not exists public.corporate_credit_pools (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid references public.workspace_organizations(id) on delete cascade,
+  workspace_id uuid references public.workspaces(id) on delete cascade,
+  name text not null,
+  balance numeric(12,2) not null default 0,
+  reserved numeric(12,2) not null default 0,
+  monthly_limit numeric(12,2),
+  status text not null default 'active' check (status in ('active', 'paused', 'closed')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_public_api_keys_workspace on public.public_api_keys(workspace_id, status);
+create index if not exists idx_public_api_keys_hash on public.public_api_keys(key_hash);
+create index if not exists idx_webhook_endpoints_workspace on public.webhook_endpoints(workspace_id, status);
+create index if not exists idx_webhook_deliveries_workspace on public.webhook_deliveries(workspace_id, event_type, created_at desc);
+create index if not exists idx_marketplace_listings_type_status on public.marketplace_listings(type, status, pricing_type);
+create index if not exists idx_platform_usage_events_workspace on public.platform_usage_events(workspace_id, event_type, created_at desc);
+create index if not exists idx_workspace_organizations_owner on public.workspace_organizations(owner_workspace_id, status);
+create index if not exists idx_corporate_credit_pools_org on public.corporate_credit_pools(organization_id, status);
+
+alter table public.public_api_keys enable row level security;
+alter table public.webhook_endpoints enable row level security;
+alter table public.webhook_deliveries enable row level security;
+alter table public.marketplace_listings enable row level security;
+alter table public.platform_usage_events enable row level security;
+alter table public.workspace_organizations enable row level security;
+alter table public.workspace_organization_members enable row level security;
+alter table public.corporate_credit_pools enable row level security;
+
+drop policy if exists "Workspace members read public API keys" on public.public_api_keys;
+create policy "Workspace members read public API keys" on public.public_api_keys for select using (
+  exists (select 1 from public.workspace_users wu where wu.workspace_id = public_api_keys.workspace_id and wu.user_id = auth.uid() and wu.status = 'active')
+  or exists (select 1 from public.workspaces w where w.id = public_api_keys.workspace_id and w.owner_id = auth.uid())
+);
+
+drop policy if exists "Workspace members read webhook endpoints" on public.webhook_endpoints;
+create policy "Workspace members read webhook endpoints" on public.webhook_endpoints for select using (
+  exists (select 1 from public.workspace_users wu where wu.workspace_id = webhook_endpoints.workspace_id and wu.user_id = auth.uid() and wu.status = 'active')
+  or exists (select 1 from public.workspaces w where w.id = webhook_endpoints.workspace_id and w.owner_id = auth.uid())
+);
+
+drop policy if exists "Workspace members read webhook deliveries" on public.webhook_deliveries;
+create policy "Workspace members read webhook deliveries" on public.webhook_deliveries for select using (
+  exists (select 1 from public.workspace_users wu where wu.workspace_id = webhook_deliveries.workspace_id and wu.user_id = auth.uid() and wu.status = 'active')
+  or exists (select 1 from public.workspaces w where w.id = webhook_deliveries.workspace_id and w.owner_id = auth.uid())
+);
+
+drop policy if exists "Published marketplace listings are readable" on public.marketplace_listings;
+create policy "Published marketplace listings are readable" on public.marketplace_listings for select using (status = 'published');
+
+drop policy if exists "Workspace members read platform usage events" on public.platform_usage_events;
+create policy "Workspace members read platform usage events" on public.platform_usage_events for select using (
+  workspace_id is null
+  or exists (select 1 from public.workspace_users wu where wu.workspace_id = platform_usage_events.workspace_id and wu.user_id = auth.uid() and wu.status = 'active')
+  or exists (select 1 from public.workspaces w where w.id = platform_usage_events.workspace_id and w.owner_id = auth.uid())
+);
+
+
+-- ============================================================
+-- Source: supabase\migrations\20260611_c1_workspace_security.sql
+-- ============================================================
+insert into public.permissions (key, description) values
+  ('admin.manage', 'Manage platform integrations, API keys, webhooks, and administrative platform settings')
+on conflict (key) do update set description = excluded.description;
+
+insert into public.role_permissions (role_id, permission_id)
+select r.id, p.id
+from public.roles r
+cross join public.permissions p
+where r.name in ('Owner', 'Admin')
+  and p.key = 'admin.manage'
+on conflict do nothing;
+
+
+-- ============================================================
+-- Source: supabase\seed.sql
+-- ============================================================
+-- R6.6 minimal seed for a clean Supabase project.
+-- Create Auth users in Supabase Auth first. Then optionally set DEMO_OWNER_ID below.
+
+insert into public.permissions (key, description) values
+  ('workspace.manage', 'Manage workspace settings'),
+  ('users.invite', 'Invite users'),
+  ('users.remove', 'Remove users'),
+  ('roles.manage', 'Manage roles and permissions'),
+  ('projects.create', 'Create projects'),
+  ('projects.update', 'Update projects'),
+  ('content.create', 'Create content'),
+  ('content.publish', 'Publish content'),
+  ('library.manage', 'Manage library assets'),
+  ('content.organize', 'Move, copy, duplicate, and archive content'),
+  ('keywords.manage', 'Manage keyword libraries'),
+  ('personas.manage', 'Manage project personas'),
+  ('ai.generate', 'Run AI generations'),
+  ('ai.manage', 'Manage AI providers, prompts, agents, and costs'),
+  ('media.generate', 'Generate narration, images, subtitles, and renders'),
+  ('media.manage', 'Manage media providers, libraries, assets, and video projects'),
+  ('billing.manage', 'Manage billing and credits'),
+  ('export_video', 'Create export packages and publication kits'),
+  ('download_package', 'Download export packages and bulk exports'),
+  ('mark_as_published', 'Mark manual publications as completed'),
+  ('edit_metadata', 'Edit publication metadata and SEO fields'),
+  ('upload_asset', 'Upload assets to the central library'),
+  ('delete_asset', 'Delete assets from the central library'),
+  ('edit_asset', 'Edit asset metadata'),
+  ('favorite_asset', 'Favorite assets'),
+  ('create_collection', 'Create asset collections'),
+  ('import_external_asset', 'Import assets from external providers'),
+  ('view_templates', 'View premium templates and packs'),
+  ('create_template', 'Create personal templates'),
+  ('edit_template', 'Edit template configuration'),
+  ('delete_template', 'Delete templates'),
+  ('use_template', 'Use templates in Magic Mode, channels, and bulk generation'),
+  ('manage_template_packs', 'Manage template packs'),
+  ('audit.read', 'Read audit logs')
+on conflict (key) do nothing;
+
+insert into public.plans (
+  name, slug, description, monthly_price, yearly_price, included_credits,
+  max_workspaces, max_channels, max_projects, max_team_members,
+  max_videos_per_month, max_renders_per_month, max_ai_video_generations,
+  max_viral_clips, watermark_enabled, priority_queue, white_label_enabled, status
+) values
+  ('Basic', 'basic', 'Seed minimo para beta interno com limites conservadores.', 97, 970, 1000, 1, 1, 3, 2, 20, 20, 5, 10, true, false, false, 'active'),
+  ('Pro', 'pro', 'Seed minimo para operacao beta com producao semanal.', 197, 1970, 5000, 2, 5, 15, 5, 100, 100, 25, 50, false, true, false, 'active')
+on conflict (slug) do update set
+  name = excluded.name,
+  description = excluded.description,
+  monthly_price = excluded.monthly_price,
+  yearly_price = excluded.yearly_price,
+  included_credits = excluded.included_credits,
+  max_workspaces = excluded.max_workspaces,
+  max_channels = excluded.max_channels,
+  max_projects = excluded.max_projects,
+  max_team_members = excluded.max_team_members,
+  max_videos_per_month = excluded.max_videos_per_month,
+  max_renders_per_month = excluded.max_renders_per_month,
+  max_ai_video_generations = excluded.max_ai_video_generations,
+  max_viral_clips = excluded.max_viral_clips,
+  watermark_enabled = excluded.watermark_enabled,
+  priority_queue = excluded.priority_queue,
+  white_label_enabled = excluded.white_label_enabled,
+  status = excluded.status,
+  updated_at = now();
+
+delete from public.feature_flags where workspace_id is null;
+
+insert into public.feature_flags (workspace_id, feature_key, enabled, limit_value) values
+  (null, 'generate_script', true, null),
+  (null, 'generate_voice', true, null),
+  (null, 'generate_image', true, null),
+  (null, 'render_video', true, null),
+  (null, 'export_package', true, null),
+  (null, 'generate_thumbnail', true, null),
+  (null, 'viral_clips', true, null),
+  (null, 'ai_video', true, null),
+  (null, 'bulk_generation', true, null),
+  (null, 'create_channel', true, null),
+  (null, 'create_project', true, null),
+  (null, 'invite_user', true, null),
+  (null, 'white_label', false, null);
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values
+  ('videos', 'videos', false, 524288000, array['video/mp4','video/webm','video/quicktime']),
+  ('thumbnails', 'thumbnails', false, 20971520, array['image/png','image/jpeg','image/webp']),
+  ('exports', 'exports', false, 1073741824, array['application/zip','application/octet-stream']),
+  ('audio', 'audio', false, 104857600, array['audio/mpeg','audio/wav','audio/ogg','audio/mp4']),
+  ('images', 'images', false, 52428800, array['image/png','image/jpeg','image/webp']),
+  ('temp', 'temp', false, 1073741824, null)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+-- Optional demo workspace after creating a Supabase Auth user:
+-- insert into public.workspaces (id, name, slug, plan, owner_id)
+-- values ('00000000-0000-0000-0000-000000000001', 'Video Flow Demo', 'video-flow-demo', 'Basic', '<auth-user-id>')
+-- on conflict (slug) do nothing;
+-- C9: credenciais de provedores configuraveis pela UI (server-side only)
+
+create table if not exists public.provider_credentials (
+  id uuid primary key default gen_random_uuid(),
+  key_name text not null unique,
+  key_value text not null,
+  updated_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+comment on table public.provider_credentials is
+  'Chaves de API de provedores (OpenAI, ElevenLabs, etc). Acesso apenas via service role; nunca expor ao cliente.';
+
+alter table public.provider_credentials enable row level security;
+
+-- Sem policies: somente o service role (backend) le e escreve.
