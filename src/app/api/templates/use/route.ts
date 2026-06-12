@@ -21,11 +21,21 @@ export async function POST(request: NextRequest) {
     metadata: { event: "template_action", action, template: template.name }
   });
 
+  if (action !== "magic_mode") {
+    return NextResponse.json({
+      status: "not_implemented",
+      action,
+      template_id: template.id,
+      error: "Esta acao de template ainda nao possui persistencia real. Use Magic Mode para aplicar as configuracoes do template.",
+      available_action: "magic_mode"
+    }, { status: 501 });
+  }
+
   return NextResponse.json({
-    status: "completed",
+    status: "ready",
     action,
     template_id: template.id,
-    message: messageFor(action, template.name),
+    message: `Magic Mode preparado com o template ${template.name}.`,
     magic_settings: templateToMagicSettings(template),
     inherited: {
       niche: template.niche,
@@ -37,17 +47,7 @@ export async function POST(request: NextRequest) {
       subtitle_style: template.subtitleStyle,
       music_mood: template.musicMood,
       thumbnail_prompt: template.thumbnailPrompt
-    }
+    },
+    provider_mode: "settings_only"
   });
-}
-
-function messageFor(action: string, templateName: string) {
-  const messages: Record<string, string> = {
-    create_channel: `Canal mockado preparado com o template ${templateName}.`,
-    magic_mode: `Magic Mode preparado com o template ${templateName}.`,
-    save_personal: `Template ${templateName} salvo como personalizado em modo demo.`,
-    duplicate: `Template ${templateName} duplicado em modo demo.`,
-    edit_settings: `Configuracoes do template ${templateName} abertas em modo demo.`
-  };
-  return messages[action] ?? messages.magic_mode;
 }
