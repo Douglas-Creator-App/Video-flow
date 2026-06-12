@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { canUseFeature } from "@/lib/billing";
 import { enqueueJob } from "@/lib/jobs/job-queue";
 import { authenticatePublicApiKey, platformErrorResponse, recordPlatformUsage } from "@/lib/platform/api-keys";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +10,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const videoProjectId = String(body.video_project_id ?? "");
     if (!videoProjectId) return NextResponse.json({ error: "video_project_id obrigatorio." }, { status: 400 });
+    const exists = await assertVideoProjectOwnership(key.workspaceId, videoProjectId);
+    if (!exists) return NextResponse.json({ error: "video_project_id nao encontrado neste workspace." }, { status: 404 });
     const requiredCredits = body.quality === "preview" ? 1 : Number(body.duration_seconds ?? 60) > 90 ? 10 : 3;
     const usage = await canUseFeature(key.workspaceId, "render_video", requiredCredits);
     if (!usage.allowed) return NextResponse.json({ error: usage.reason, usage }, { status: 402 });
@@ -25,4 +28,15 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return platformErrorResponse(error);
   }
+}
+
+async function assertVideoProjectOwnership(workspaceId: string, videoProjectId: string) {
+  const { data, error } = await createAdminClient()
+    .from("video_projects")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("id", videoProjectId)
+    .maybeSingle();
+  if (error) throw new Error(`Falha ao validar video_project_id: ${error.message}`);
+  return Boolean(data?.id);
 }

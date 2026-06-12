@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
   const context = await requirePermission(workspaceId, "admin.manage");
   if (!isSupabaseAdminConfigured()) return NextResponse.json({ error: "Supabase admin nao configurado." }, { status: 503 });
   const url = String(body.url ?? "");
-  if (!/^https?:\/\//.test(url)) return NextResponse.json({ error: "URL de webhook invalida." }, { status: 400 });
+  const urlValidation = validateWebhookUrl(url);
+  if (urlValidation) return NextResponse.json({ error: urlValidation }, { status: 400 });
   const events = Array.isArray(body.events) ? body.events.map(String).filter((event: string) => allowedEvents.includes(event)) : ["job_completed"];
   const secret = createWebhookSecret();
   const { data, error } = await createAdminClient().from("webhook_endpoints").insert({
@@ -40,4 +41,16 @@ export async function POST(request: NextRequest) {
   }).select("id, url, events, status, created_at").single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ endpoint: data, secret, warning: "Copie agora. O segredo assina os webhooks e nao sera exibido novamente." });
+}
+
+function validateWebhookUrl(value: string) {
+  try {
+    const url = new URL(value);
+    const isLocal = ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+    if (url.protocol === "https:") return "";
+    if (process.env.NODE_ENV !== "production" && isLocal && url.protocol === "http:") return "";
+    return "Webhook deve usar HTTPS. HTTP so e aceito para localhost em desenvolvimento.";
+  } catch {
+    return "URL de webhook invalida.";
+  }
 }
