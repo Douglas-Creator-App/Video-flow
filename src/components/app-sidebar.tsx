@@ -89,6 +89,7 @@ const items = [
   { href: "/app/notifications", label: "Notificacoes", icon: Bell },
   { href: "/app/docs/production", label: "Docs Producao", icon: BookOpen },
   { href: "/app/settings/data", label: "LGPD / Dados", icon: FileArchive },
+  { href: "/app/settings/api-keys", label: "API Keys", icon: Settings },
   { href: "/app/settings/providers", label: "Providers Reais", icon: Settings },
   { href: "/app/settings/video-providers", label: "Video Providers", icon: Settings },
   { href: "/app/videos", label: "Videos", icon: Bot },

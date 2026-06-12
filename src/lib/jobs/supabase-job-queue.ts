@@ -131,6 +131,7 @@ export async function appendSupabaseJobLog(jobId: string, level: BackgroundJobLo
 
 export async function retrySupabaseJob(jobId: string) {
   const supabase = createAdminClient();
+  const current = await getSupabaseJob(jobId);
   const scheduledAt = new Date(Date.now() + 5_000).toISOString();
   const { data, error } = await supabase.from("background_jobs").update({
     status: "queued",
@@ -145,8 +146,16 @@ export async function retrySupabaseJob(jobId: string) {
     updated_at: new Date().toISOString()
   }).eq("id", jobId).select("*").single();
   if (error) throw new Error(`Falha ao reenfileirar job: ${error.message}`);
+  const job = mapJob(data as DbJob);
+  // Jobs em falha definitiva ou cancelados ja tiveram a reserva estornada;
+  // o retry manual precisa reservar de novo para o debito na conclusao.
+  const requiredCredits = creditsFromPayload(job.payload);
+  const reservationReleased = current?.job.status === "failed" || current?.job.status === "cancelled";
+  if (requiredCredits > 0 && reservationReleased) {
+    await reserveCreditsForJob({ workspaceId: job.workspaceId, userId: job.userId, jobId: job.id, jobType: job.type, amount: requiredCredits });
+  }
   await appendSupabaseJobLog(jobId, "info", "Job reenfileirado para retry");
-  return mapJob(data as DbJob);
+  return job;
 }
 
 export async function cancelSupabaseJob(jobId: string) {
@@ -185,7 +194,9 @@ export async function failSupabaseJob(jobId: string, errorMessage: string) {
   if (error) throw new Error(`Falha ao marcar job como falho: ${error.message}`);
   const job = mapJob(data as DbJob);
   const requiredCredits = creditsFromPayload(job.payload);
-  if (requiredCredits > 0 && !/provider consumiu|consumed/i.test(errorMessage)) {
+  // Estorna a reserva apenas na falha definitiva: em "retrying" a reserva
+  // precisa permanecer ativa para o debito correto quando o retry concluir.
+  if (requiredCredits > 0 && job.status === "failed" && !/provider consumiu|consumed/i.test(errorMessage)) {
     await settleReservedCreditsForJob({ workspaceId: job.workspaceId, userId: job.userId, jobId: job.id, jobType: job.type, amount: requiredCredits, consumed: false });
   }
   await appendSupabaseJobLog(jobId, "error", `Job falhou: ${errorMessage}`);

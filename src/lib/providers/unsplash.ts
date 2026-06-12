@@ -1,6 +1,8 @@
+import { ensureProviderCredentials } from "@/lib/providers/credentials";
 import type { ExternalAssetSearchResult } from "@/lib/types";
 
 export async function searchUnsplashPhotos(query: string, options: { perPage?: number } = {}) {
+  await ensureProviderCredentials();
   const key = process.env.UNSPLASH_ACCESS_KEY;
   if (!key) return fallback(query, "UNSPLASH_ACCESS_KEY ausente; resultados demonstrativos usados.");
   try {

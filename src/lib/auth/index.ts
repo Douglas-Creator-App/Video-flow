@@ -96,14 +96,14 @@ export async function requireRateLimit(input: {
   const config = await resolveRateLimitConfig(input.workspaceId, input.feature);
   const windowStartedAt = new Date(Date.now() - config.windowSeconds * 1000).toISOString();
   const admin = createAdminClient();
-  const { data, error } = await admin
+  const { count: eventCount, error } = await admin
     .from("rate_limit_events")
-    .select("id", { count: "exact", head: false })
+    .select("id", { count: "exact", head: true })
     .eq("workspace_id", input.workspaceId)
     .eq("feature", input.feature)
     .gte("created_at", windowStartedAt);
   if (error) throw new Error(`Falha ao ler rate limit: ${error.message}`);
-  const count = data?.length ?? 0;
+  const count = eventCount ?? 0;
   if (count >= config.limitCount) {
     await recordSecurityEvent({
       workspaceId: input.workspaceId,

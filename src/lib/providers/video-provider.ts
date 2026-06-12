@@ -1,3 +1,5 @@
+import { ensureProviderCredentials } from "@/lib/providers/credentials";
+
 export type VideoProviderTask = "text_to_video" | "image_to_video" | "talking_character";
 
 export interface VideoProviderInput {
@@ -17,6 +19,7 @@ const keyByProvider: Record<string, string> = {
 };
 
 export async function generateAiVideoReal(input: VideoProviderInput): Promise<Record<string, unknown>> {
+  await ensureProviderCredentials();
   const provider = input.provider ?? (process.env.DEFAULT_VIDEO_PROVIDER as VideoProviderInput["provider"]) ?? "runway";
   const envKey = keyByProvider[provider];
   if (!process.env[envKey]) throw new Error(`${envKey} ausente. Provider de vídeo IA não configurado.`);

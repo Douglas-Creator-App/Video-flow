@@ -1,7 +1,9 @@
+import { ensureProviderCredentials } from "@/lib/providers/credentials";
 import { friendlyProviderError, providerMissing, sanitizePrompt } from "@/lib/providers/provider-utils";
 
 export async function generateOpenAiImages(input: { prompt: string; aspectRatio?: string; size?: string; quantity?: number; style?: string; model?: string }) {
   const startedAt = Date.now();
+  await ensureProviderCredentials();
   const apiKey = process.env.OPENAI_API_KEY;
   const prompt = sanitizePrompt(`${input.prompt}\nStyle: ${input.style ?? "cinematografico"}\nAspect ratio: ${input.aspectRatio ?? "9:16"}`, 4000);
   const quantity = Math.max(1, Math.min(Number(input.quantity ?? 1), 4));

@@ -1,7 +1,9 @@
+import { ensureProviderCredentials } from "@/lib/providers/credentials";
 import { friendlyProviderError, providerMissing, sanitizePrompt } from "@/lib/providers/provider-utils";
 
 export async function generateOpenAiTts(input: { text: string; voice?: string; speed?: number; format?: "mp3" | "wav" | "opus"; model?: string }) {
   const startedAt = Date.now();
+  await ensureProviderCredentials();
   const apiKey = process.env.OPENAI_API_KEY;
   const text = sanitizePrompt(input.text, 4096);
   const voice = input.voice ?? "alloy";
