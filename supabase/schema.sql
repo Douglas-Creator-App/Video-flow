@@ -1911,6 +1911,13 @@ begin
     target_entity_id := coalesce(new.id, old.id);
   end if;
 
+  -- Deletes em cascata podem rodar depois do workspace sumir; o log
+  -- nao pode referenciar um workspace inexistente.
+  if target_workspace_id is not null
+     and not exists (select 1 from public.workspaces w where w.id = target_workspace_id) then
+    target_workspace_id := null;
+  end if;
+
   insert into public.audit_logs (
     workspace_id,
     actor_id,
