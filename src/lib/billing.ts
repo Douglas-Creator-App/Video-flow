@@ -92,6 +92,15 @@ export async function canUseFeature(workspaceId: string, feature: BillingFeature
     return decision(false, "Workspace suspenso. Reative pelo Admin Master antes de gerar.", "workspace_suspended", requiredCredits, 0);
   }
 
+  // Modelo BYOK: cada usuário usa as próprias chaves e paga o consumo direto no provedor.
+  // Por isso a geração é liberada sem checar saldo de créditos ou limite de plano.
+  // (A cobrança real vem do provedor; aqui só validamos que o workspace está ativo.)
+  // Pode-se reativar o modelo de créditos definindo BYOK_MODE=false.
+  const byokMode = process.env.BYOK_MODE !== "false";
+  if (byokMode) {
+    return decision(true, "BYOK: geracao liberada (chaves do proprio usuario).", "ok", 0, Number.MAX_SAFE_INTEGER);
+  }
+
   const { data: subscriptionRow, error: subscriptionError } = await supabase
     .from("subscriptions")
     .select("*")

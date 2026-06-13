@@ -7,32 +7,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useWorkspaceProvider } from "@/components/workspace/workspace-provider";
 
 type ProviderKeyStatus = {
   key_name: string;
   configured: boolean;
-  source: "app" | "env" | null;
   masked: string | null;
   updated_at: string | null;
 };
 
-const KEY_LABELS: Record<string, { label: string; hint: string }> = {
-  OPENAI_API_KEY: { label: "OpenAI", hint: "Roteiros, títulos, imagens e voz (TTS)." },
-  ELEVENLABS_API_KEY: { label: "ElevenLabs", hint: "Vozes premium para narração." },
+const KEY_LABELS: Record<string, { label: string; hint: string; link?: string }> = {
+  OPENAI_API_KEY: { label: "OpenAI", hint: "Roteiros, títulos, imagens e voz (TTS).", link: "https://platform.openai.com/api-keys" },
+  ELEVENLABS_API_KEY: { label: "ElevenLabs", hint: "Vozes premium para narração.", link: "https://elevenlabs.io/app/settings/api-keys" },
   RUNWAY_API_KEY: { label: "Runway", hint: "Geração de vídeo com IA." },
   KLING_API_KEY: { label: "Kling", hint: "Geração de vídeo com IA." },
   PIKA_API_KEY: { label: "Pika", hint: "Geração de vídeo com IA." },
   VEO_API_KEY: { label: "Veo", hint: "Geração de vídeo com IA (Google)." },
   LUMA_API_KEY: { label: "Luma", hint: "Geração de vídeo com IA." },
-  PEXELS_API_KEY: { label: "Pexels", hint: "Banco de fotos e vídeos stock." },
-  PIXABAY_API_KEY: { label: "Pixabay", hint: "Banco de fotos e vídeos stock." },
-  UNSPLASH_ACCESS_KEY: { label: "Unsplash", hint: "Banco de fotos stock." }
+  PEXELS_API_KEY: { label: "Pexels", hint: "Banco de fotos e vídeos (grátis).", link: "https://www.pexels.com/api/" },
+  PIXABAY_API_KEY: { label: "Pixabay", hint: "Banco de fotos e vídeos (grátis).", link: "https://pixabay.com/api/docs/" },
+  UNSPLASH_ACCESS_KEY: { label: "Unsplash", hint: "Banco de fotos (grátis).", link: "https://unsplash.com/developers" }
 };
 
 export function ProviderKeysPanel() {
-  const { currentWorkspace } = useWorkspaceProvider();
-  const workspaceId = currentWorkspace?.id ?? "";
   const [keys, setKeys] = useState<ProviderKeyStatus[]>([]);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
@@ -40,10 +36,9 @@ export function ProviderKeysPanel() {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    if (!workspaceId) return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/provider-keys?workspace_id=${workspaceId}`, { cache: "no-store" });
+      const response = await fetch("/api/admin/provider-keys", { cache: "no-store" });
       const data = await response.json();
       if (!response.ok) {
         setMessage(data.error ?? "Falha ao carregar chaves.");
@@ -54,21 +49,20 @@ export function ProviderKeysPanel() {
     } finally {
       setLoading(false);
     }
-  }, [workspaceId]);
+  }, []);
 
   useEffect(() => {
     void load();
   }, [load]);
 
   async function saveKey(keyName: string, value: string) {
-    if (!workspaceId) return;
     setSavingKey(keyName);
     setMessage("");
     try {
       const response = await fetch("/api/admin/provider-keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workspace_id: workspaceId, key_name: keyName, key_value: value })
+        body: JSON.stringify({ key_name: keyName, key_value: value })
       });
       const data = await response.json();
       if (!response.ok) {
@@ -83,27 +77,19 @@ export function ProviderKeysPanel() {
     }
   }
 
-  if (!workspaceId) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-sm text-muted-foreground">
-          Selecione um workspace para gerenciar as chaves de API.
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <Card className="border-primary/15 bg-card/80">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <KeyRound className="h-4 w-4 text-primary" />
-            Chaves de API dos provedores
+            Suas chaves de API
           </CardTitle>
           <CardDescription>
-            Cole aqui as chaves dos serviços de IA e mídia. Elas ficam guardadas apenas no backend e nunca são
-            expostas ao navegador — esta tela mostra somente uma versão mascarada.
+            Cole aqui as chaves dos serviços de IA e mídia que <strong>você</strong> usa. Elas são guardadas de forma
+            criptografada, só no backend, e ficam vinculadas à sua conta — nunca aparecem para outros usuários nem no
+            navegador. A geração de vídeo usa as suas chaves, então o consumo é cobrado direto na sua conta de cada
+            provedor.
           </CardDescription>
         </CardHeader>
         {message ? (
@@ -131,12 +117,20 @@ export function ProviderKeysPanel() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <CardTitle className="text-base">{meta.label}</CardTitle>
-                      <CardDescription>{meta.hint}</CardDescription>
+                      <CardDescription>
+                        {meta.hint}
+                        {meta.link ? (
+                          <>
+                            {" "}
+                            <a href={meta.link} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                              pegar chave
+                            </a>
+                          </>
+                        ) : null}
+                      </CardDescription>
                     </div>
                     {item.configured ? (
-                      <Badge className="border-primary/20 bg-primary/10 text-primary">
-                        {item.source === "env" ? "via .env" : "configurada"}
-                      </Badge>
+                      <Badge className="border-primary/20 bg-primary/10 text-primary">configurada</Badge>
                     ) : (
                       <Badge className="border-border bg-secondary text-muted-foreground">não configurada</Badge>
                     )}
@@ -165,7 +159,7 @@ export function ProviderKeysPanel() {
                         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                         Salvar
                       </Button>
-                      {item.source === "app" ? (
+                      {item.configured ? (
                         <Button
                           variant="outline"
                           onClick={() => saveKey(item.key_name, "")}

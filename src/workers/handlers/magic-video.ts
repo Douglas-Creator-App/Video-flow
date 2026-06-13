@@ -1,4 +1,5 @@
-import { estimateMagicCost, runMagicVideoPipeline, secondsFromDuration } from "@/lib/magic/magic-pipeline";
+import { estimateMagicCost, secondsFromDuration } from "@/lib/magic/magic-pipeline";
+import { runMagicVideoPipeline } from "@/lib/magic/magic-pipeline.server";
 import { logMediaUsage, logProviderUsage } from "@/lib/billing/credit-ledger";
 import { persistVideoProjectBundle } from "@/lib/video/video-repository";
 import type { MagicAdvancedSettings, MagicDurationTarget, MagicVisualStyle } from "@/lib/types";

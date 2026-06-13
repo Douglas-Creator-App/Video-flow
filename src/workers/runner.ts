@@ -10,6 +10,7 @@ import {
   type BackgroundJob,
   type BackgroundJobType
 } from "@/lib/jobs/job-queue";
+import { runWithUserCredentials } from "@/lib/providers/credentials";
 import { aiGenerationHandler } from "@/workers/handlers/ai-generation";
 import { aiVideoHandler } from "@/workers/handlers/ai-video";
 import { backupHandler } from "@/workers/handlers/backup";
@@ -47,7 +48,8 @@ export async function processNextJob(workerId = `worker_${Date.now()}`) {
   }
 
   try {
-    const result = await processJob(job);
+    // BYOK: processa o job usando as chaves de API do usuário dono do job.
+    const result = await runWithUserCredentials(job.userId, () => processJob(job));
     await completeJob(job.id, result);
     await recordHeartbeat(workerId, "idle", { lastJobId: job.id, lastStatus: "completed" });
     return { status: "completed" as const, job_id: job.id, result };

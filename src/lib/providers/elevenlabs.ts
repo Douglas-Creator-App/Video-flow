@@ -1,11 +1,10 @@
-import { ensureProviderCredentials } from "@/lib/providers/credentials";
+import { getProviderKey } from "@/lib/providers/credentials";
 import { friendlyProviderError, providerMissing, sanitizePrompt } from "@/lib/providers/provider-utils";
 
 const elevenBaseUrl = "https://api.elevenlabs.io/v1";
 
 export async function listElevenLabsVoices() {
-  await ensureProviderCredentials();
-  const apiKey = process.env.ELEVENLABS_API_KEY;
+  const apiKey = getProviderKey("ELEVENLABS_API_KEY");
   if (!apiKey) return { status: "completed" as const, providerMode: "mock" as const, voices: mockVoices(), warning: providerMissing("ELEVENLABS_API_KEY") };
   try {
     const response = await fetch(`${elevenBaseUrl}/voices`, { headers: { "xi-api-key": apiKey } });
@@ -19,8 +18,7 @@ export async function listElevenLabsVoices() {
 
 export async function generateElevenLabsSpeech(input: { text: string; voiceId?: string; model?: string }) {
   const startedAt = Date.now();
-  await ensureProviderCredentials();
-  const apiKey = process.env.ELEVENLABS_API_KEY;
+  const apiKey = getProviderKey("ELEVENLABS_API_KEY");
   const text = sanitizePrompt(input.text, 5000);
   const voiceId = input.voiceId ?? "21m00Tcm4TlvDq8ikWAM";
   if (!apiKey) return mockSpeech(text, "mock", providerMissing("ELEVENLABS_API_KEY"), startedAt);

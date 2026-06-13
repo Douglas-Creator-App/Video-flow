@@ -1,6 +1,7 @@
 import { logMediaUsage, logProviderUsage } from "@/lib/billing/credit-ledger";
 import { generateOpenAiImages } from "@/lib/providers/openai-images";
 import { buildWorkspaceStoragePath, isSupabaseStorageConfigured, uploadMediaFile } from "@/lib/storage/media-storage";
+import { getProviderKey } from "@/lib/providers/credentials";
 
 export interface ImageProviderInput {
   workspaceId: string;
@@ -48,5 +49,5 @@ export async function generateImagesReal(input: ImageProviderInput) {
 }
 
 export function imageProviderStatus() {
-  return { openai_images: Boolean(process.env.OPENAI_API_KEY) };
+  return { openai_images: Boolean(getProviderKey("OPENAI_API_KEY")) };
 }

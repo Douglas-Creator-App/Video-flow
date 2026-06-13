@@ -2,6 +2,7 @@ import { logMediaUsage, logProviderUsage } from "@/lib/billing/credit-ledger";
 import { generateElevenLabsSpeech } from "@/lib/providers/elevenlabs";
 import { generateOpenAiTts } from "@/lib/providers/openai-tts";
 import { buildWorkspaceStoragePath, uploadMediaFile, isSupabaseStorageConfigured } from "@/lib/storage/media-storage";
+import { getProviderKey } from "@/lib/providers/credentials";
 
 export interface TtsProviderInput {
   workspaceId: string;
@@ -44,7 +45,7 @@ export async function generateTtsReal(input: TtsProviderInput) {
 
 export function ttsProviderStatus() {
   return {
-    openai_tts: Boolean(process.env.OPENAI_API_KEY),
-    elevenlabs: Boolean(process.env.ELEVENLABS_API_KEY)
+    openai_tts: Boolean(getProviderKey("OPENAI_API_KEY")),
+    elevenlabs: Boolean(getProviderKey("ELEVENLABS_API_KEY"))
   };
 }

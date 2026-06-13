@@ -2,10 +2,30 @@ import { generateOpenAiTextStrict } from "@/lib/providers/openai-provider";
 import { generateImagesReal } from "@/lib/providers/image-provider";
 import { generateTtsReal } from "@/lib/providers/tts-provider";
 import { generateAiVideoReal } from "@/lib/providers/video-provider";
+import { runWithUserCredentials } from "@/lib/providers/credentials";
 
 export type ProviderTaskType = "text" | "metadata" | "tts" | "image" | "video" | "speech_to_text" | "transcription" | "thumbnail" | "moderation";
 
 export async function runProviderTask(input: {
+  type: ProviderTaskType;
+  workspaceId?: string;
+  userId?: string;
+  prompt?: string;
+  systemPrompt?: string;
+  text?: string;
+  style?: string;
+  aspectRatio?: string;
+  quantity?: number;
+  voiceId?: string;
+  provider?: string;
+  referenceId?: string;
+  allowFallback?: boolean;
+}) {
+  // BYOK: usa as chaves do usuário que disparou a requisição.
+  return runWithUserCredentials(input.userId, () => runProviderTaskInner(input));
+}
+
+async function runProviderTaskInner(input: {
   type: ProviderTaskType;
   workspaceId?: string;
   userId?: string;

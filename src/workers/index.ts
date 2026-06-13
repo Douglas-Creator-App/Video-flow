@@ -1,5 +1,4 @@
 import { recordHeartbeat } from "@/lib/jobs/job-queue";
-import { ensureProviderCredentials } from "@/lib/providers/credentials";
 import { processNextJob } from "@/workers/runner";
 
 const workerId = `video-flow-worker-${Date.now()}`;
@@ -8,7 +7,6 @@ const concurrency = Math.max(1, Math.min(Number(process.env.WORKER_CONCURRENCY ?
 
 async function loop() {
   console.log(`[worker] ${workerId} iniciado. Polling ${intervalMs}ms. Concorrencia ${concurrency}.`);
-  await ensureProviderCredentials(true);
   await recordHeartbeat(workerId, "active", { pid: "node", intervalMs, concurrency });
   while (true) {
     const results = await Promise.all(Array.from({ length: concurrency }, (_, index) => processNextJob(`${workerId}-${index + 1}`)));

@@ -1,9 +1,8 @@
-import { ensureProviderCredentials } from "@/lib/providers/credentials";
+import { getProviderKey } from "@/lib/providers/credentials";
 import type { AssetOrientation, ExternalAssetSearchResult } from "@/lib/types";
 
 export async function searchPexelsPhotos(query: string, options: { perPage?: number; orientation?: AssetOrientation } = {}) {
-  await ensureProviderCredentials();
-  const key = process.env.PEXELS_API_KEY;
+  const key = getProviderKey("PEXELS_API_KEY");
   if (!key) return fallback("pexels", query, "image", "PEXELS_API_KEY ausente; resultados demonstrativos usados.");
   try {
     const url = new URL("https://api.pexels.com/v1/search");
@@ -20,8 +19,7 @@ export async function searchPexelsPhotos(query: string, options: { perPage?: num
 }
 
 export async function searchPexelsVideos(query: string, options: { perPage?: number; orientation?: AssetOrientation } = {}) {
-  await ensureProviderCredentials();
-  const key = process.env.PEXELS_API_KEY;
+  const key = getProviderKey("PEXELS_API_KEY");
   if (!key) return fallback("pexels", query, "video", "PEXELS_API_KEY ausente; resultados demonstrativos usados.");
   try {
     const url = new URL("https://api.pexels.com/videos/search");

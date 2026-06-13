@@ -1,4 +1,4 @@
-import { ensureProviderCredentials } from "@/lib/providers/credentials";
+import { getProviderKey } from "@/lib/providers/credentials";
 import { estimateOpenAiTextCost, estimateTextTokens, friendlyProviderError, jsonHeaders, providerMissing, sanitizePrompt } from "@/lib/providers/provider-utils";
 
 export async function generateText(input: {
@@ -9,8 +9,7 @@ export async function generateText(input: {
   maxTokens?: number;
 }) {
   const startedAt = Date.now();
-  await ensureProviderCredentials();
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = getProviderKey("OPENAI_API_KEY");
   const systemPrompt = sanitizePrompt(input.systemPrompt, 4000);
   const userPrompt = sanitizePrompt(input.userPrompt, 12000);
   const model = input.model ?? "gpt-4.1-mini";

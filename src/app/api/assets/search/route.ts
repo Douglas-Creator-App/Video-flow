@@ -1,12 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { registerAuditLog } from "@/lib/audit";
 import { requireAuth, requirePermission } from "@/lib/auth";
-import { autoMatchVisual, searchAssets, searchExternalAssets } from "@/lib/assets";
+import { autoMatchVisual, searchAssets } from "@/lib/assets";
+import { searchExternalAssets } from "@/lib/assets-external";
+import { runWithUserCredentials } from "@/lib/providers/credentials";
 import type { AssetOrientation, AssetProvider, AssetSourceType, AssetType } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
-  await requireAuth();
+  const { user } = await requireAuth();
   const query = params.get("q") ?? "";
   const provider = (params.get("provider") ?? "library") as AssetProvider | "library";
   const type = (params.get("type") ?? "all") as AssetType | "all";
@@ -16,13 +18,13 @@ export async function GET(request: NextRequest) {
     const workspaceId = String(params.get("workspace_id") ?? "");
     if (!workspaceId) return NextResponse.json({ status: "failed", error: "workspace_id obrigatorio." }, { status: 400 });
     await requirePermission(workspaceId, "library.manage");
-    const result = await searchExternalAssets({
+    const result = await runWithUserCredentials(user.id, () => searchExternalAssets({
       workspaceId,
       provider,
       query,
       type: type === "video" ? "video" : "image",
       orientation: orientation === "all" ? undefined : orientation
-    });
+    }));
     return NextResponse.json({ ...result, source: provider });
   }
 

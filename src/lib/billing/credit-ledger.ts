@@ -6,6 +6,9 @@ export function isCreditLedgerConfigured() {
 }
 
 export function creditsFromPayload(payload?: Record<string, unknown>) {
+  // Modelo BYOK: sem cobrança de créditos (o cliente paga o provedor direto).
+  // Defina BYOK_MODE=false para reativar a reserva/cobrança de créditos.
+  if (process.env.BYOK_MODE !== "false") return 0;
   const value = Number(payload?.required_credits ?? payload?.requiredCredits ?? 0);
   return Number.isFinite(value) && value > 0 ? value : 0;
 }

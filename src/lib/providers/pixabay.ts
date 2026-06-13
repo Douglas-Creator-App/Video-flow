@@ -1,4 +1,4 @@
-import { ensureProviderCredentials } from "@/lib/providers/credentials";
+import { getProviderKey } from "@/lib/providers/credentials";
 import type { AssetOrientation, ExternalAssetSearchResult } from "@/lib/types";
 
 export async function searchPixabayImages(query: string, options: { perPage?: number; orientation?: AssetOrientation } = {}) {
@@ -10,8 +10,7 @@ export async function searchPixabayVideos(query: string, options: { perPage?: nu
 }
 
 async function searchPixabay(type: "image" | "video", query: string, options: { perPage?: number; orientation?: AssetOrientation }) {
-  await ensureProviderCredentials();
-  const key = process.env.PIXABAY_API_KEY;
+  const key = getProviderKey("PIXABAY_API_KEY");
   if (!key) return fallback(query, type, "PIXABAY_API_KEY ausente; resultados demonstrativos usados.");
   try {
     const url = new URL(type === "video" ? "https://pixabay.com/api/videos/" : "https://pixabay.com/api/");

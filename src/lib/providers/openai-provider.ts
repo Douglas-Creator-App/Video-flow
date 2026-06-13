@@ -1,5 +1,6 @@
 import { generateText } from "@/lib/providers/openai-text";
 import { providerMissing } from "@/lib/providers/provider-utils";
+import { getProviderKey } from "@/lib/providers/credentials";
 
 export interface OpenAiTextInput {
   systemPrompt: string;
@@ -11,7 +12,7 @@ export interface OpenAiTextInput {
 }
 
 export async function generateOpenAiTextStrict(input: OpenAiTextInput) {
-  if (!process.env.OPENAI_API_KEY) throw new Error(providerMissing("OPENAI_API_KEY"));
+  if (!getProviderKey("OPENAI_API_KEY")) throw new Error(providerMissing("OPENAI_API_KEY"));
   const result = await generateText({
     systemPrompt: input.systemPrompt,
     userPrompt: input.userPrompt,
@@ -26,5 +27,5 @@ export async function generateOpenAiTextStrict(input: OpenAiTextInput) {
 }
 
 export function openAiTextConfigured() {
-  return Boolean(process.env.OPENAI_API_KEY);
+  return Boolean(getProviderKey("OPENAI_API_KEY"));
 }
