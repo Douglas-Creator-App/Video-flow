@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AlertTriangle, Loader2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CreateWorkspaceCard } from "@/components/workspace/create-workspace-card";
 import { useWorkspaceProvider } from "@/components/workspace/workspace-provider";
 import type { WorkspaceGuardProps } from "@/lib/workspace/types";
 
@@ -37,7 +38,7 @@ export function WorkspaceGuard({
   }
 
   if (!currentWorkspace) {
-    return <GuardCard icon={AlertTriangle} title={emptyTitle} description={emptyDescription} actionHref="/app/onboarding" actionLabel="Abrir onboarding" />;
+    return <CreateWorkspaceCard />;
   }
 
   if (requirePermission && !currentWorkspace.permissions.includes(requirePermission) && !currentWorkspace.isOwner) {

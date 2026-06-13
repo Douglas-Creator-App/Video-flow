@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { ActivationChecklist } from "@/components/onboarding/activation-checklist";
+import { WorkspaceBootstrapBanner } from "@/components/workspace/workspace-bootstrap-banner";
 
 const metrics = [
   { label: "Conteúdos Gerados", value: "0", change: "—" },
@@ -29,6 +30,8 @@ export default function DashboardPage() {
           Bem-vindo ao Video Flow. Comece criando seu primeiro projeto para ver suas métricas aqui.
         </p>
       </div>
+
+      <WorkspaceBootstrapBanner />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => (

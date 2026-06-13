@@ -23,7 +23,8 @@ Run these SQL files in this order against a clean Supabase project:
 6. `supabase/migrations/20260610_r11_platform_ecosystem.sql`
 7. `supabase/migrations/20260611_c1_workspace_security.sql`
 8. `supabase/migrations/20260612_c9_provider_credentials.sql`
-9. `supabase/seed.sql`
+9. `supabase/migrations/20260612_c10_fix_audit_on_workspace_delete.sql`
+10. `supabase/seed.sql`
 
 ## Required app env values
 
@@ -56,6 +57,7 @@ If the SQL Editor fails with a generic parsing error, run the smaller files in `
 7. `07_c1_workspace_security.sql`
 8. `08_seed.sql`
 9. `09_c9_provider_credentials.sql`
+10. `10_c10_fix_audit_on_workspace_delete.sql`
 
 After the SQL is applied:
 

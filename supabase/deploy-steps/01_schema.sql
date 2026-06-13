@@ -1895,7 +1895,11 @@ declare
   target_entity_id uuid;
 begin
   if tg_table_name = 'workspaces' then
-    target_workspace_id := coalesce(new.id, old.id);
+    if tg_op = 'DELETE' then
+      target_workspace_id := null;
+    else
+      target_workspace_id := coalesce(new.id, old.id);
+    end if;
     target_entity_id := coalesce(new.id, old.id);
   elsif tg_table_name = 'content_item_tags' then
     target_workspace_id := coalesce(new.workspace_id, old.workspace_id);
